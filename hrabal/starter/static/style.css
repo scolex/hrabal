@@ -1,42 +1,33 @@
+/* The starter's own rules on top of neat.css, the way Neat suggests with its custom.css. */
+
+/* our own warmer colors, poured into Neat's variables so everything in neat.css picks them up */
 :root {
-  --text: #222;
+  --light: #fdfcf9; /* background */
+  --lesslight: #f1ede4; /* code, table lines */
+  --dark: #3b2a1e; /* text and headings, a dark brown */
+  --moredark: #24180f;
+  --link: #8b5e34;
   --muted: #777;
-  --background: #fdfcf9;
-  --accent: #8b5e34;
+  border-top: none; /* neat.css draws a dark stripe across the top */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #e6e2da;
+    --light: #1c1b19;
+    --lesslight: #2b2926;
+    --dark: #e6e2da;
+    --moredark: #fff;
+    --link: #d9a96a;
     --muted: #999;
-    --background: #1c1b19;
-    --accent: #d9a96a;
   }
 }
 
-body {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font: 1.05rem/1.6 Georgia, serif;
-  color: var(--text);
-  background: var(--background);
-}
-
 a {
-  color: var(--accent);
+  color: var(--link);
 }
 
-header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
-header nav a {
-  margin-left: 1rem;
+.button {
+  background-color: var(--link);
 }
 
 .site-title {
@@ -44,9 +35,25 @@ header nav a {
   text-decoration: none;
 }
 
-time {
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  padding-top: 2em;
+  margin-bottom: 2em;
+}
+
+header nav a + a {
+  margin-left: 1em;
+}
+
+time,
+footer,
+.pagination span {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.9em;
 }
 
 .posts {
@@ -55,51 +62,41 @@ time {
 }
 
 .posts li {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5em;
 }
 
 .posts time {
-  margin-left: 0.5rem;
+  margin-left: 0.5em;
 }
 
 .summary p {
-  margin: 0.3rem 0;
+  margin: 0.3em 0;
 }
 
-pre {
-  padding: 1rem;
-  overflow-x: auto;
-  border-radius: 4px;
-  font-size: 0.9rem;
+/* highlighted code brings its own background, neat.css would paint every <code> light gray */
+pre code {
+  background-color: transparent;
 }
 
 table {
   border-collapse: collapse;
 }
 
-th, td {
-  padding: 0.3rem 0.8rem;
-  border-bottom: 1px solid var(--muted);
+th,
+td {
+  padding: 0.3em 0.8em;
+  border-bottom: 1px solid var(--lesslight);
   text-align: left;
-}
-
-img {
-  max-width: 100%;
 }
 
 .neighbours,
 .pagination {
   display: flex;
   justify-content: space-between;
-  margin-top: 3rem;
-}
-
-.pagination span {
-  color: var(--muted);
+  align-items: center;
+  margin-top: 3em;
 }
 
 footer {
-  margin-top: 4rem;
-  color: var(--muted);
-  font-size: 0.9rem;
+  margin-top: 4em;
 }

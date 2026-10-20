@@ -39,9 +39,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
+
+    def end_headers(self):
+        # without this a browser can keep an old stylesheet after the live reload
+        self.send_header("Cache-Control", "no-cache")
+        super().end_headers()
 
     def log_message(self, format, *args):
         pass  # one line per request is too noisy, the reload polling alone would flood the terminal

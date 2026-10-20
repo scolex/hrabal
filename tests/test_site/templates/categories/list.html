@@ -1,0 +1,4 @@
+Categories, with their own template:
+{% for term in taxonomy.terms.values() %}
+{{ term.name }} ({{ term.pages | length }}) -> {{ term.permalink }}
+{% endfor %}

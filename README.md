@@ -40,6 +40,10 @@ site/
 Every folder in `content/` is a **section** and every other Markdown file is a **page**.
 `_index.md` is optional and only there to give the section a title and settings.
 A page can also be a folder with `index.md` inside, then the rest of the folder is copied along with it.
+A folder can't have both, it's either a section or a page. Files starting with a dot are skipped.
+
+A date at the start of a file name becomes the page's date: `2024-05-01_hello.md` (or `2024-05-01-hello.md`)
+lives at `/hello/` and is dated May 1st, unless the front matter says otherwise. Works for page folders too.
 
 ## Front matter
 
@@ -64,7 +68,11 @@ anything = "you like"
 ```
 
 Sections take `title`, `description`, `sort_by` (`date`, `title`, `weight` or `none`),
-`weight`, `template`, `page_template` and `extra`.
+`weight`, `draft`, `template`, `page_template`, `paginate_by`, `paginate_path`, `paginate_reversed`
+and `extra`.
+
+A draft section takes everything inside it along, subsections included.
+`page_template` applies to the subsections too, unless one of them sets its own.
 
 Unknown keys are an error. That's on purpose, so typos don't go unnoticed.
 
@@ -73,17 +81,45 @@ Put `<!-- more -->` in a page to mark where its summary ends.
 ## Links
 
 Link to other content by its file path: `[read this](@/blog/first-post.md)`.
+Files that live in a page folder work the same way, in links and images:
+`![photo](@/blog/with-pictures/photo.jpg)`.
 Links get checked during the build, so a broken one stops it.
+
+## Pagination
+
+Works like in Zola. Set `paginate_by` in a section's `_index.md` and its pages get split into pagers
+of that size: the first one at the section's own url, the others at `page/2/`, `page/3/` and so on.
+`page/1/` just redirects to the first one.
+
+```toml
++++
+title = "Blog"
+paginate_by = 10
+paginate_path = "strana"   # /blog/strana/2/ instead of /blog/page/2/, "" gives /blog/2/
+paginate_reversed = true   # oldest first, if the section sorts newest first
++++
+```
+
+Taxonomy terms can be paginated too, write the taxonomy as a table in `config.toml`:
+
+```toml
+taxonomies = ["tags", { name = "categories", paginate_by = 5 }]
+```
+
+The template then gets a `paginator` with `pages` (the ones on this pager), `current_index` (from 1),
+`number_pagers`, `paginate_by`, `total_pages`, `first`, `last`, `previous` and `next` (urls, or
+nothing at the ends) and `base_url`, so `paginator.base_url ~ 3 ~ "/"` links to the third pager.
+Without `paginate_by` there's no `paginator` at all, and `section.pages` always holds every page.
 
 ## Templates
 
-| Template                    | Used for                    | Variables           |
-|-----------------------------|-----------------------------|---------------------|
-| `index.html`                | the root section            | `section`           |
-| `section.html`              | every other section         | `section`           |
-| `page.html`                 | pages                       | `page`              |
-| `taxonomy/list.html`        | `/tags/`                    | `taxonomy`          |
-| `taxonomy/single.html`      | `/tags/books/`              | `taxonomy`, `term`  |
+| Template                    | Used for                    | Variables                       |
+|-----------------------------|-----------------------------|---------------------------------|
+| `index.html`                | the root section            | `section`, `paginator`          |
+| `section.html`              | every other section         | `section`, `paginator`          |
+| `page.html`                 | pages                       | `page`                          |
+| `taxonomy/list.html`        | `/tags/`                    | `taxonomy`                      |
+| `taxonomy/single.html`      | `/tags/books/`              | `taxonomy`, `term`, `paginator` |
 
 `tags/list.html` and `tags/single.html` take precedence if a taxonomy needs its own look.
 
@@ -96,9 +132,10 @@ Everywhere you also get `config` and these functions:
 
 and a `date` filter: `{{ page.date | date("%d. %m. %Y") }}`.
 
-Pages have `title`, `content`, `summary`, `date`, `permalink`, `path`, `taxonomies`, `extra`,
-`previous` and `next` (neighbours in the section's order). Sections have `title`, `content`,
-`pages`, `subsections`, `permalink` and `extra`.
+Pages have `title`, `description`, `content`, `summary`, `date`, `permalink`, `path`, `slug`,
+`taxonomies`, `assets`, `extra`, `previous` and `next` (neighbours in the section's order).
+Sections have `title`, `description`, `content`, `pages`, `subsections`, `permalink`, `path` and `extra`.
+`draft` only decides whether something gets built, templates don't see it.
 
 ## Development
 
@@ -119,6 +156,15 @@ docker compose run --rm dev pytest
 docker compose run --rm dev ruff format
 docker compose run --rm dev ruff check
 docker compose run --rm dev ty check
+```
+
+Most tests run against `tests/test_site/`, a small site in the spirit of Zola's own test site.
+Its templates print plain `Label: value` lines, so a test can check exactly what a template got.
+When you add a feature, give it some content there and a line in a template, then assert on the output.
+It's a normal site, so you can also look at it in the browser:
+
+```sh
+docker compose run --rm --service-ports dev hrabal -r tests/test_site serve -i 0.0.0.0
 ```
 
 To try the dev server, `--service-ports` publishes port 1111 and `-i 0.0.0.0` makes hrabal listen

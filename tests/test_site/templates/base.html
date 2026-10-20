@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="{{ config.language }}">
+<head>
+  <title>{% block title %}{{ config.title }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ get_url('site.css') }}">
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+</html>

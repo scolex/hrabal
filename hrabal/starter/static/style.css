@@ -87,10 +87,15 @@ img {
   max-width: 100%;
 }
 
-.neighbours {
+.neighbours,
+.pagination {
   display: flex;
   justify-content: space-between;
   margin-top: 3rem;
+}
+
+.pagination span {
+  color: var(--muted);
 }
 
 footer {

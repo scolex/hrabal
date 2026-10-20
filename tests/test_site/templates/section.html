@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import pager_info %}
+
+{% block title %}{{ section.title }}{% endblock %}
+
+{% block content %}
+Section: {{ section.title }}
+File: {{ section.file }}
+Path: {{ section.path }}
+{% if section.description %}
+Description: {{ section.description }}
+{% endif %}
+Pages: {{ section.pages | length }}
+Sub-sections: {{ section.subsections | length }}
+{% for page in section.pages %}
+Page: {{ page.title }} -> {{ page.permalink }}
+{% endfor %}
+{% for sub in section.subsections %}
+Subsection: {{ sub.title }}
+{% endfor %}
+{% if section.extra.we_have_extra %}
+Extra: {{ section.extra.we_have_extra }}
+{% endif %}
+
+{% if paginator %}
+{{ pager_info(paginator) }}
+{% endif %}
+
+{{ section.content | safe }}
+{% endblock %}

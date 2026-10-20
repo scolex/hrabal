@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "macros.html" import pager_info %}
+
+{% block content %}
+Site: {{ config.title }}
+Author: {{ config.extra.author }}
+Sub-sections: {{ section.subsections | length }}
+Root pages: {% for page in section.pages %}{{ page.title }};{% endfor %}
+
+Latest post: {{ get_section("posts/_index.md").pages[0].title }}
+get_page: {{ get_page("hello.md").permalink }}
+get_url to a page: {{ get_url("@/hello.md") }}
+get_url to a page file: {{ get_url("@/posts/with-assets/zola.png") }}
+get_url to a static file: {{ get_url("site.css") }}
+
+{% if paginator %}
+{{ pager_info(paginator) }}
+{% endif %}
+
+{{ section.content | safe }}
+{% endblock %}

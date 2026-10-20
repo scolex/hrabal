@@ -8,8 +8,21 @@ from pathlib import Path
 from hrabal import HrabalError
 
 PAGE_KEYS = {"title", "description", "date", "slug", "weight", "draft", "template", "taxonomies", "extra"}
-SECTION_KEYS = {"title", "description", "weight", "sort_by", "template", "page_template", "extra"}
+SECTION_KEYS = {
+    "title",
+    "description",
+    "weight",
+    "draft",
+    "sort_by",
+    "template",
+    "page_template",
+    "paginate_by",
+    "paginate_path",
+    "paginate_reversed",
+    "extra",
+}
 SORT_OPTIONS = ("date", "title", "weight", "none")
+DATE_IN_NAME = re.compile(r"(\d{4}-\d{2}-\d{2})[_-](.+)")
 
 
 @dataclass(eq=False)
@@ -22,7 +35,6 @@ class Page:
     description: str = ""
     date: datetime.date | None = None
     weight: int = 0
-    draft: bool = False
     template: str = "page.html"
     taxonomies: dict[str, list[str]] = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
@@ -45,6 +57,9 @@ class Section:
     sort_by: str = "date"
     template: str = "section.html"
     page_template: str = "page.html"
+    paginate_by: int = 0  # 0 means one long list, no pagination
+    paginate_path: str = "page"
+    paginate_reversed: bool = False
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
@@ -66,6 +81,8 @@ class Taxonomy:
     name: str
     path: str
     permalink: str
+    paginate_by: int = 0  # for the term pages, the list of all terms is never paginated
+    paginate_path: str = "page"
     terms: dict[str, Term] = field(default_factory=dict, repr=False)
 
 
@@ -99,6 +116,17 @@ def sort_pages(pages: list[Page], sort_by: str) -> list[Page]:
     if sort_by == "weight":
         return sorted(pages, key=lambda p: p.weight)
     return pages
+
+
+def split_date(name: str) -> tuple[datetime.date | None, str]:
+    # "2016-10-08_a-post" -> (2016-10-08, "a-post"), a dash works as the separator too
+    match = DATE_IN_NAME.fullmatch(name)
+    if not match:
+        return None, name
+    try:
+        return datetime.date.fromisoformat(match[1]), match[2]
+    except ValueError:
+        return None, name  # looks like a date, but isn't one, like 2016-13-45
 
 
 def slugify(text: str) -> str:

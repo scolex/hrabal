@@ -1,0 +1,4 @@
+Generic list of {{ taxonomy.name }}:
+{% for term in taxonomy.terms.values() %}
+{{ term.name }} ({{ term.pages | length }})
+{% endfor %}

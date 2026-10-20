@@ -2,12 +2,22 @@
 {% from "macros.html" import post_list %}
 
 {% block title %}{{ section.title }} · {{ config.title }}{% endblock %}
+{% block description %}{{ section.description or config.description }}{% endblock %}
 
 {% block content %}
 <h1>{{ section.title }}</h1>
 {{ section.content | safe }}
 
+{% if paginator %}
+{{ post_list(paginator.pages) }}
+<nav class="pagination">
+  {% if paginator.previous %}<a href="{{ paginator.previous }}">← Newer</a>{% endif %}
+  {% if paginator.number_pagers > 1 %}<span>{{ paginator.current_index }} / {{ paginator.number_pagers }}</span>{% endif %}
+  {% if paginator.next %}<a href="{{ paginator.next }}">Older →</a>{% endif %}
+</nav>
+{% else %}
 {{ post_list(section.pages) }}
+{% endif %}
 
 {% if section.subsections %}
 <h2>More</h2>

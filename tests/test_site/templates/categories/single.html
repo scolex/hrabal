@@ -1,0 +1,8 @@
+{% from "macros.html" import pager_info %}
+Category: {{ term.name }}
+{% for page in term.pages %}
+Page: {{ page.title }}
+{% endfor %}
+{% if paginator %}
+{{ pager_info(paginator) }}
+{% endif %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+Title: {{ page.title }}
+File: {{ page.file }}
+Slug: {{ page.slug }}
+{% if page.date %}
+Date: {{ page.date | date("%d. %m. %Y") }}
+ISO date: {{ page.date | date }}
+{% endif %}
+{% if page.description %}
+Description: {{ page.description }}
+{% endif %}
+{% if page.extra.mood %}
+Mood: {{ page.extra.mood }}
+{% endif %}
+{% if page.previous %}
+Previous: {{ page.previous.title }}
+{% endif %}
+{% if page.next %}
+Next: {{ page.next.title }}
+{% endif %}
+{% for name, terms in page.taxonomies.items() %}
+{% for term in terms %}
+Term: {{ name }}/{{ term }} -> {{ get_taxonomy_url(name, term) }}
+{% endfor %}
+{% endfor %}
+{% for asset in page.assets %}
+Asset: {{ asset.name }}
+{% endfor %}
+{% if page.summary %}
+Summary: {{ page.summary | safe }}
+{% endif %}
+
+{{ page.content | safe }}
+{% endblock %}

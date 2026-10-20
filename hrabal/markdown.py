@@ -20,6 +20,7 @@ class Markdown:
 
         self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
         self.md.add_render_rule("link_open", render_link)
+        self.md.add_render_rule("image", render_image)
 
     def render(self, text: str, resolve_link) -> str:
         return self.md.render(text, {"resolve_link": resolve_link})
@@ -46,8 +47,16 @@ class Markdown:
 
 
 def render_link(renderer, tokens, idx, options, env):
-    token = tokens[idx]
-    href = token.attrGet("href")
-    if href and href.startswith("@/"):
-        token.attrSet("href", env["resolve_link"](unquote(href)))
+    resolve_internal_link(tokens[idx], "href", env)
     return renderer.renderToken(tokens, idx, options, env)
+
+
+def render_image(renderer, tokens, idx, options, env):
+    resolve_internal_link(tokens[idx], "src", env)
+    return renderer.image(tokens, idx, options, env)
+
+
+def resolve_internal_link(token, attribute: str, env):
+    url = token.attrGet(attribute)
+    if isinstance(url, str) and url.startswith("@/"):
+        token.attrSet(attribute, env["resolve_link"](unquote(url)))

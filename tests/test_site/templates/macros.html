@@ -1,0 +1,18 @@
+{# prints everything a paginator has, Zola's test site does the same in section_paginated.html #}
+{% macro pager_info(paginator) %}
+Pager pages: {% for page in paginator.pages %}{{ page.title }};{% endfor %}
+
+Num pagers: {{ paginator.number_pagers }}
+Page size: {{ paginator.paginate_by }}
+Current index: {{ paginator.current_index }}
+Total pages: {{ paginator.total_pages }}
+First: {{ paginator.first }}
+Last: {{ paginator.last }}
+Base url: {{ paginator.base_url }}
+{% if paginator.previous %}
+has_prev: {{ paginator.previous }}
+{% endif %}
+{% if paginator.next %}
+has_next: {{ paginator.next }}
+{% endif %}
+{% endmacro %}

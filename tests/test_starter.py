@@ -36,6 +36,17 @@ def test_starter_is_styled_with_neat_css(starter_dir):
     assert "Copyright (c) 2021-2026 by Dare Companies Dotcom LLC" in (public / "neat.css").read_text(encoding="utf-8")
 
 
+def test_starter_has_a_theme_switch(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    index = (public / "index.html").read_text(encoding="utf-8")
+    assert 'class="theme-switch"' in index
+    assert index.index("theme.js") < index.index("</head>")  # early, so the page doesn't flash
+    assert (public / "theme.js").exists()
+    assert ':root[data-theme="dark"]' in (public / "style.css").read_text(encoding="utf-8")
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "macros.html" import post_list %}
+
+{% block title %}#{{ term.name }} · {{ config.title }}{% endblock %}
+
+{% block content %}
+<h1>#{{ term.name }}</h1>
+{{ post_list(term.pages) }}
+<p><a href="{{ taxonomy.permalink }}">All {{ taxonomy.name }}</a></p>
+{% endblock %}

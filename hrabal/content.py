@@ -1,0 +1,108 @@
+import datetime
+import re
+import tomllib
+import unicodedata
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from hrabal import HrabalError
+
+PAGE_KEYS = {"title", "description", "date", "slug", "weight", "draft", "template", "taxonomies", "extra"}
+SECTION_KEYS = {"title", "description", "weight", "sort_by", "template", "page_template", "extra"}
+SORT_OPTIONS = ("date", "title", "weight", "none")
+
+
+@dataclass(eq=False)
+class Page:
+    file: Path
+    slug: str
+    path: str
+    permalink: str
+    title: str = ""
+    description: str = ""
+    date: datetime.date | None = None
+    weight: int = 0
+    draft: bool = False
+    template: str = "page.html"
+    taxonomies: dict[str, list[str]] = field(default_factory=dict)
+    extra: dict = field(default_factory=dict)
+    raw_content: str = field(default="", repr=False)
+    content: str = field(default="", repr=False)
+    summary: str = field(default="", repr=False)
+    assets: list[Path] = field(default_factory=list)
+    previous: Page | None = field(default=None, repr=False)
+    next: Page | None = field(default=None, repr=False)
+
+
+@dataclass(eq=False)
+class Section:
+    file: Path
+    path: str
+    permalink: str
+    title: str = ""
+    description: str = ""
+    weight: int = 0
+    sort_by: str = "date"
+    template: str = "section.html"
+    page_template: str = "page.html"
+    extra: dict = field(default_factory=dict)
+    raw_content: str = field(default="", repr=False)
+    content: str = field(default="", repr=False)
+    pages: list[Page] = field(default_factory=list, repr=False)
+    subsections: list[Section] = field(default_factory=list, repr=False)
+
+
+@dataclass(eq=False)
+class Term:
+    name: str
+    slug: str
+    path: str
+    permalink: str
+    pages: list[Page] = field(default_factory=list, repr=False)
+
+
+@dataclass(eq=False)
+class Taxonomy:
+    name: str
+    path: str
+    permalink: str
+    terms: dict[str, Term] = field(default_factory=dict, repr=False)
+
+
+def read_markdown(file: Path, allowed_keys: set[str]) -> tuple[dict, str]:
+    text = file.read_text(encoding="utf-8")
+    if not text.startswith("+++"):
+        return {}, text
+
+    parts = text.split("+++", 2)
+    if len(parts) < 3:
+        raise HrabalError(f"{file}: front matter is missing the closing +++")
+
+    try:
+        meta = tomllib.loads(parts[1])
+    except tomllib.TOMLDecodeError as e:
+        raise HrabalError(f"{file}: {e}") from None
+
+    unknown = meta.keys() - allowed_keys
+    if unknown:
+        raise HrabalError(f"{file}: unknown front matter {', '.join(sorted(unknown))} (put your own under [extra])")
+
+    return meta, parts[2]
+
+
+def sort_pages(pages: list[Page], sort_by: str) -> list[Page]:
+    if sort_by == "date":
+        # isoformat() lets plain dates and datetimes sort together, undated pages end up last
+        return sorted(pages, key=lambda p: p.date.isoformat() if p.date else "", reverse=True)
+    if sort_by == "title":
+        return sorted(pages, key=lambda p: p.title.casefold())
+    if sort_by == "weight":
+        return sorted(pages, key=lambda p: p.weight)
+    return pages
+
+
+def slugify(text: str) -> str:
+    # "Příliš hlučná samota" -> "prilis-hlucna-samota"
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")

@@ -1,0 +1,100 @@
+:root {
+  --text: #222;
+  --muted: #777;
+  --background: #fdfcf9;
+  --accent: #8b5e34;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e6e2da;
+    --muted: #999;
+    --background: #1c1b19;
+    --accent: #d9a96a;
+  }
+}
+
+body {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font: 1.05rem/1.6 Georgia, serif;
+  color: var(--text);
+  background: var(--background);
+}
+
+a {
+  color: var(--accent);
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+header nav a {
+  margin-left: 1rem;
+}
+
+.site-title {
+  font-weight: bold;
+  text-decoration: none;
+}
+
+time {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.posts {
+  padding: 0;
+  list-style: none;
+}
+
+.posts li {
+  margin-bottom: 1.5rem;
+}
+
+.posts time {
+  margin-left: 0.5rem;
+}
+
+.summary p {
+  margin: 0.3rem 0;
+}
+
+pre {
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.3rem 0.8rem;
+  border-bottom: 1px solid var(--muted);
+  text-align: left;
+}
+
+img {
+  max-width: 100%;
+}
+
+.neighbours {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+footer {
+  margin-top: 4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}

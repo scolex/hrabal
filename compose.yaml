@@ -1,0 +1,13 @@
+services:
+  dev:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - .:/app
+    ports:
+      # set PUBLISH_ADDRESS=0.0.0.0 in .env to reach the dev server from other machines
+      - "${PUBLISH_ADDRESS:-127.0.0.1}:1111:1111"
+    init: true

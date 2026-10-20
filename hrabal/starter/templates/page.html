@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
+{% block description %}{{ page.description or config.description }}{% endblock %}
+
+{% block content %}
+<article>
+  <h1>{{ page.title }}</h1>
+  {% if page.date %}<time>{{ page.date | date("%d %B %Y") }}</time>{% endif %}
+
+  {{ page.content | safe }}
+
+  {% if page.taxonomies.tags %}
+  <p class="tags">
+    {% for tag in page.taxonomies.tags %}
+    <a href="{{ get_taxonomy_url('tags', tag) }}">#{{ tag }}</a>
+    {% endfor %}
+  </p>
+  {% endif %}
+</article>
+
+{% if page.previous or page.next %}
+<nav class="neighbours">
+  {% if page.previous %}<a href="{{ page.previous.permalink }}">← {{ page.previous.title }}</a>{% endif %}
+  {% if page.next %}<a href="{{ page.next.permalink }}">{{ page.next.title }} →</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

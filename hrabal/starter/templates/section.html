@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "macros.html" import post_list %}
+
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ section.title }}</h1>
+{{ section.content | safe }}
+
+{{ post_list(section.pages) }}
+
+{% if section.subsections %}
+<h2>More</h2>
+<ul>
+  {% for sub in section.subsections %}
+  <li><a href="{{ sub.permalink }}">{{ sub.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,53 @@
+[project]
+name = "hrabal"
+version = "0.1.0"
+description = "A small static site generator in the spirit of Zola"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.14"
+dependencies = [
+    "jinja2>=3.1",
+    "markdown-it-py>=3.0",
+    "pygments>=2.14",
+]
+
+[project.scripts]
+hrabal = "hrabal.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.16",
+    "ty>=0.0.81",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.15,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+# public PyPI on purpose, so the lockfile works the same on any machine and in Docker
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "W",
+    "F",    # pyflakes
+    "I",    # import sorting
+    "B",    # bugbear
+    "UP",   # pyupgrade
+    "SIM",  # simplify
+    "RUF",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

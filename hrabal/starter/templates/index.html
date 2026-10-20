@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "macros.html" import post_list %}
+
+{% block content %}
+{{ section.content | safe }}
+
+<h2>Latest posts</h2>
+{{ post_list(get_section("blog/_index.md").pages[:5]) }}
+{% endblock %}

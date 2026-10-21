@@ -238,3 +238,133 @@ pre.mermaid {
 .search-dialog .search {
   padding: 1.5em;
 }
+
+/* GitHub-style alerts, > [!NOTE] and friends: a colored edge, a faint tint and a title */
+.markdown-alert {
+  --alert: #2f6690;
+  --alert-icon: url("alerts/note.svg");
+  margin: 1.5em 0;
+  padding: 0.6em 1em;
+  border-left: 4px solid var(--alert);
+  border-radius: 0 0.375em 0.375em 0;
+  background-color: color-mix(in srgb, var(--alert) 8%, transparent);
+}
+
+.markdown-alert > :last-child {
+  margin-bottom: 0.3em;
+}
+
+.markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0.2em 0 0.25em;
+  color: var(--alert);
+  font-weight: bold;
+}
+
+/* the text sits right under its title, without a paragraph's usual gap */
+.markdown-alert-title + * {
+  margin-top: 0;
+}
+
+/* the icon is a mask filled with the alert's color, so it follows the theme like the rest */
+.markdown-alert-title::before {
+  content: "";
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
+  background-color: currentColor;
+  -webkit-mask: var(--alert-icon) center / contain no-repeat;
+  mask: var(--alert-icon) center / contain no-repeat;
+}
+
+.markdown-alert-tip {
+  --alert: #3d7a3a;
+  --alert-icon: url("alerts/tip.svg");
+}
+
+.markdown-alert-important {
+  --alert: #74508f;
+  --alert-icon: url("alerts/important.svg");
+}
+
+.markdown-alert-warning {
+  --alert: #a86a12;
+  --alert-icon: url("alerts/warning.svg");
+}
+
+.markdown-alert-caution {
+  --alert: #a8382c;
+  --alert-icon: url("alerts/caution.svg");
+}
+
+/* lighter in the dark, the same two ways in as the rest of the dark colors */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .markdown-alert-note {
+    --alert: #7fb0d8;
+  }
+  :root:not([data-theme="light"]) .markdown-alert-tip {
+    --alert: #8cc487;
+  }
+  :root:not([data-theme="light"]) .markdown-alert-important {
+    --alert: #b998d4;
+  }
+  :root:not([data-theme="light"]) .markdown-alert-warning {
+    --alert: #e0a54c;
+  }
+  :root:not([data-theme="light"]) .markdown-alert-caution {
+    --alert: #e58a7e;
+  }
+}
+
+:root[data-theme="dark"] .markdown-alert-note {
+  --alert: #7fb0d8;
+}
+
+:root[data-theme="dark"] .markdown-alert-tip {
+  --alert: #8cc487;
+}
+
+:root[data-theme="dark"] .markdown-alert-important {
+  --alert: #b998d4;
+}
+
+:root[data-theme="dark"] .markdown-alert-warning {
+  --alert: #e0a54c;
+}
+
+:root[data-theme="dark"] .markdown-alert-caution {
+  --alert: #e58a7e;
+}
+
+details {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border: 1px solid var(--lesslight);
+  border-radius: 0.375em;
+}
+
+summary {
+  color: var(--link);
+  cursor: pointer;
+}
+
+hr {
+  margin: 2.5em 0;
+  border: none;
+  border-top: 1px solid var(--lesslight);
+}
+
+/* the # next to every heading, there when you look for it */
+.anchor {
+  color: var(--muted);
+  font-weight: normal;
+  text-decoration: none;
+  opacity: 0;
+}
+
+:is(h1, h2, h3, h4, h5, h6):hover .anchor,
+.anchor:focus-visible {
+  opacity: 1;
+}

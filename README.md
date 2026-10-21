@@ -78,6 +78,36 @@ Unknown keys are an error. That's on purpose, so typos don't go unnoticed.
 
 Put `<!-- more -->` in a page to mark where its summary ends.
 
+## Heading anchors
+
+Every heading gets an id from its text, like in Zola: `## Quotes and alerts` becomes
+`<h2 id="quotes-and-alerts">`, Czech letters lose their accents the same way urls do, and a second
+heading with the same text gets `-1`, `-2` and so on. A page's ids are in `page.heading_ids`.
+
+`insert_anchor_links` in `config.toml` adds a link to each heading too: `"none"` (the default),
+`"left"` or `"right"` for a small `#` next to it, or `"heading"` to make the whole heading the link.
+The links have the class `anchor`, the starter shows its `#` only on hover.
+
+Links to a heading are checked like the rest: `[tables](@/blog/tour/index.md#tables)` stops the build
+when the tour has no heading that becomes `tables`.
+
+## Alerts
+
+Note, tip and warning boxes are written the way GitHub does it, as a blockquote with a marker:
+
+```markdown
+> [!WARNING]
+> Back up the site before upgrading.
+
+> [!TIP] Faster builds
+> A title of your own can follow the marker.
+```
+
+The markers are `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]`. Without a title of
+its own an alert gets one in the site's `language`, English or Czech ("Poznámka", "Varování", …).
+The HTML is GitHub's too, `<div class="markdown-alert markdown-alert-warning">` with a
+`<p class="markdown-alert-title">`, so CSS made for GitHub alerts works. The starter has its own.
+
 ## Links
 
 Link to other content by its file path: `[read this](@/blog/first-post.md)`.

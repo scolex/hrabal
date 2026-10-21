@@ -43,6 +43,7 @@ class Page:
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
     summary: str = field(default="", repr=False)
+    heading_ids: list[str] = field(default_factory=list, repr=False)  # the ids links can point to with #
     has_mermaid: bool = False  # so a template loads mermaid only where a diagram needs it
     assets: list[Path] = field(default_factory=list)
     previous: Page | None = field(default=None, repr=False)
@@ -67,6 +68,7 @@ class Section:
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
+    heading_ids: list[str] = field(default_factory=list, repr=False)
     has_mermaid: bool = False
     pages: list[Page] = field(default_factory=list, repr=False)
     subsections: list[Section] = field(default_factory=list, repr=False)

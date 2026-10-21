@@ -68,6 +68,8 @@ class Site:
         self.pages: dict[str, Page] = {}
         self.assets: dict[str, str] = {}  # files living next to a bundle's index.md, mapped to their urls
         self.taxonomies: dict[str, Taxonomy] = {}
+        # links like @/page.md#heading, checked once every page knows its headings
+        self.anchors_to_check: list[tuple[Any, str, Page | Section, str]] = []
 
     def build(self):
         self.load()
@@ -198,29 +200,48 @@ class Site:
 
     def render_content(self):
         # runs after everything is loaded, so internal links can point anywhere
-        self.markdown = Markdown(self.config.highlight_theme if self.config.highlight_code else None)
+        self.markdown = Markdown(
+            self.config.highlight_theme if self.config.highlight_code else None,
+            language=self.config.language,
+        )
 
         for section in self.sections.values():
-            section.content = self.render_markdown(section.raw_content, section.file)
+            section.content = self.render_markdown(section.raw_content, section.file, section.heading_ids)
             section.has_mermaid = has_mermaid(section.content)
 
         for page in self.pages.values():
-            page.content = self.render_markdown(page.raw_content, page.file)
+            page.content = self.render_markdown(page.raw_content, page.file, page.heading_ids)
             page.has_mermaid = has_mermaid(page.content)
             summary, more, _ = page.raw_content.partition("<!-- more -->")
             if more:
                 page.summary = self.render_markdown(summary, page.file)
 
-    def render_markdown(self, text: str, source: Path) -> str:
-        return self.markdown.render(text, lambda link: self.resolve_link(link, source))
+        # only now does every page know its headings
+        self.check_anchors()
+
+    def render_markdown(self, text: str, source: Path, heading_ids: list[str] | None = None) -> str:
+        return self.markdown.render(
+            text,
+            lambda link: self.resolve_link(link, source),
+            anchor_links=self.config.insert_anchor_links,
+            heading_ids=heading_ids,
+        )
 
     def resolve_link(self, link: str, source) -> str:
         target, hash, anchor = link.removeprefix("@/").partition("#")
         if item := self.pages.get(target) or self.sections.get(target):
+            if anchor:
+                self.anchors_to_check.append((source, link, item, anchor))
             return item.permalink + hash + anchor
         if target in self.assets:
             return self.assets[target]
         raise HrabalError(f"{source}: broken internal link {link}")
+
+    def check_anchors(self):
+        for source, link, item, anchor in self.anchors_to_check:
+            if anchor not in item.heading_ids:
+                raise HrabalError(f"{source}: {link} points to a heading that isn't there")
+        self.anchors_to_check.clear()
 
     def permalink(self, path: str) -> str:
         return self.config.base_url.rstrip("/") + path
@@ -271,6 +292,7 @@ class Site:
                 else:
                     self.render(single, term.path, taxonomy=taxonomy, term=term)
 
+        self.check_anchors()  # the ones from get_url() in templates
         self.write_feeds()
         if self.config.generate_sitemap:
             self.write_sitemap()

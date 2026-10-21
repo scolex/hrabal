@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, fields
 from pathlib import Path
 
 from hrabal import HrabalError
+from hrabal.anchors import ANCHOR_LINKS
 
 
 @dataclass
@@ -23,6 +24,7 @@ class Config:
     taxonomies: list[TaxonomyConfig] = field(default_factory=list)
     highlight_code: bool = True
     highlight_theme: str = "monokai"
+    insert_anchor_links: str = "none"  # or left, right, heading: a link next to or around every heading
     generate_sitemap: bool = True
     generate_robots_txt: bool = True
     generate_feeds: bool = False
@@ -50,6 +52,8 @@ def load_config(file: Path) -> Config:
 
     data["taxonomies"] = [load_taxonomy(file, entry) for entry in data.get("taxonomies", [])]
     config = Config(**data)
+    if config.insert_anchor_links not in ANCHOR_LINKS:
+        raise HrabalError(f"{file}: insert_anchor_links must be one of {', '.join(ANCHOR_LINKS)}")
     if not isinstance(config.feed_limit, int) or config.feed_limit < 0:
         raise HrabalError(f"{file}: feed_limit must be a positive number, or 0 for no limit")
     return config

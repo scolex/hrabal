@@ -4,6 +4,7 @@ description = "A site made with hrabal"
 author = "Your Name"
 taxonomies = ["tags"]
 highlight_theme = "monokai"
+insert_anchor_links = "right"
 language = "cs"
 generate_feeds = true
 build_search_index = true

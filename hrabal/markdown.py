@@ -10,12 +10,14 @@ from pygments.token import Text
 from pygments.util import ClassNotFound
 
 from hrabal import HrabalError
+from hrabal.alerts import alert_rule
+from hrabal.anchors import heading_ids
 
 MERMAID = '<pre class="mermaid">'
 
 
 class Markdown:
-    def __init__(self, highlight_theme: str | None = None):
+    def __init__(self, highlight_theme: str | None = None, language: str = "en"):
         options = {}
         if highlight_theme:
             self.setup_highlighting(highlight_theme)
@@ -25,9 +27,13 @@ class Markdown:
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
         self.md.add_render_rule("fence", render_fence)
+        self.md.core.ruler.after("block", "github_alerts", alert_rule(language))
+        self.md.core.ruler.after("inline", "heading_ids", heading_ids)
 
-    def render(self, text: str, resolve_link) -> str:
-        return self.md.render(text, {"resolve_link": resolve_link})
+    def render(self, text: str, resolve_link, anchor_links="none", heading_ids: list[str] | None = None) -> str:
+        # heading_ids, when given, gets the id of every heading, so links to them can be checked
+        ids = [] if heading_ids is None else heading_ids
+        return self.md.render(text, {"resolve_link": resolve_link, "anchor_links": anchor_links, "heading_ids": ids})
 
     def setup_highlighting(self, theme: str):
         try:

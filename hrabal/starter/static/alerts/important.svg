@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- a speech bubble with an exclamation mark -->
+  <path d="M12 3.8c-4.6 0-8.3 3.1-8.3 7 0 2.1 1.1 4 2.8 5.3l-.8 3.6 3.9-2.1c.8.2 1.6.3 2.4.3 4.6 0 8.3-3.1 8.3-7.1S16.6 3.8 12 3.8z"/>
+  <path d="M12 7.8v3.4"/>
+  <circle cx="12" cy="14" r="1.35" fill="black" stroke="none"/>
+</svg>

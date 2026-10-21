@@ -52,9 +52,10 @@ def test_starter_loads_mermaid_only_where_needed(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    about = (public / "about" / "index.html").read_text(encoding="utf-8")
-    assert '<script type="module" src="https://example.com/mermaid.js">' in about
-    assert '<pre class="mermaid">' in about
+    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    assert '<script type="module" src="https://example.com/mermaid.js">' in tour
+    assert '<pre class="mermaid">' in tour
+    assert "mermaid.js" not in (public / "about" / "index.html").read_text(encoding="utf-8")
     assert "mermaid.js" not in (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
     assert (public / "mermaid.js").exists()
 
@@ -156,6 +157,37 @@ def test_starter_adds_copy_buttons_to_code(starter_dir):
         assert (public / name).exists()
 
 
+def test_starter_tour_shows_off_what_a_post_can_hold(starter_dir):
+    Site(starter_dir).build()
+    folder = starter_dir / "public" / "blog" / "a-tour-of-hrabal"
+    tour = (folder / "index.html").read_text(encoding="utf-8")
+
+    assert "<time>20. července 2024</time>" in tour  # the date comes from the folder name
+    for kind in ("note", "tip", "important", "warning", "caution"):
+        assert f'<div class="markdown-alert markdown-alert-{kind}">' in tour
+    assert '<p class="markdown-alert-title">Varování</p>' not in tour  # the warning brings its own title
+    assert '<p class="markdown-alert-title">Before you deploy</p>' in tour
+    assert '<p class="markdown-alert-title">Poznámka</p>' in tour  # the others speak the starter's Czech
+    assert '<th style="text-align:right">Default</th>' in tour
+    assert '<pre class="highlight"' in tour
+    assert tour.count('<pre class="mermaid">') == 2
+    assert '<img src="https://example.com/blog/a-tour-of-hrabal/bale.svg"' in tour
+    assert (folder / "bale.svg").exists()
+    assert "<details>" in tour
+    assert '<h2 id="tables">Tables <a class="anchor" href="#tables"' in tour
+    assert 'href="https://example.com/blog/a-tour-of-hrabal/#code"' in tour
+
+
+def test_starter_has_an_icon_for_every_alert(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+    css = (public / "style.css").read_text(encoding="utf-8")
+
+    for kind in ("note", "tip", "important", "warning", "caution"):
+        assert (public / "alerts" / f"{kind}.svg").exists()
+        assert f'url("alerts/{kind}.svg")' in css
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"
@@ -191,7 +223,7 @@ def test_starter_blog_is_newest_first(starter_dir):
     site.load()
     blog = site.sections["blog/_index.md"]
 
-    assert [p.slug for p in blog.pages] == ["a-picture", "prilis-hlucna-samota"]
+    assert [p.slug for p in blog.pages] == ["a-tour-of-hrabal", "a-picture", "prilis-hlucna-samota"]
     assert blog.pages[0].next is blog.pages[1]
     assert blog.pages[1].previous is blog.pages[0]
 

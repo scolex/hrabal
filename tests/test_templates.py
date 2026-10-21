@@ -25,7 +25,7 @@ def test_index_sees_config_and_template_functions(public):
     assert "get_url to a page: https://example.com/hello/" in index
     assert "get_url to a page file: https://example.com/posts/with-assets/zola.png" in index
     assert "get_url to a static file: https://example.com/site.css" in index
-    assert "<h1>Welcome</h1>" in index
+    assert '<h1 id="welcome">Welcome</h1>' in index
 
 
 def test_templates_can_extend_each_other(public):
@@ -158,6 +158,16 @@ def test_pages_know_when_they_have_a_diagram(public):
     assert "Mermaid: yes" in hello
     assert '<pre class="mermaid">flowchart LR\n    hello --&gt; world\n</pre>' in hello
     assert "Mermaid: yes" not in html(public, "posts/python")
+
+
+def test_alerts_speak_the_site_language(site_dir, tmp_path):
+    config = site_dir / "config.toml"
+    config.write_text('language = "cs"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    (site_dir / "content" / "careful.md").write_text("> [!CAUTION]\n> Hot.\n", encoding="utf-8")
+    output = tmp_path / "czech"
+    Site(site_dir, output_dir=output).build()
+
+    assert '<p class="markdown-alert-title">Pozor</p>' in html(output, "careful")
 
 
 def test_markdown_tables_and_strikethrough(public):

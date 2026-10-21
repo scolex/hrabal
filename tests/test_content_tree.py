@@ -2,6 +2,7 @@
 # Tests that break the site on purpose add their files to a copy of it, see site_dir in conftest.py.
 
 import datetime
+import re
 from pathlib import Path
 
 import pytest
@@ -250,7 +251,7 @@ def test_summary_is_everything_before_more(site_dir):
 def test_internal_links_are_resolved(site_dir):
     hello = load(site_dir).pages["hello.md"].content
 
-    assert 'href="https://example.com/posts/simple/#top"' in hello
+    assert 'href="https://example.com/posts/simple/#details"' in hello
     assert 'href="https://example.com/posts/"' in hello
     assert 'href="https://example.com/posts/tutorials/"' in hello
 
@@ -286,3 +287,37 @@ def test_unknown_config_key_is_an_error(site_dir):
     config.write_text('theme = "fancy"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
     with pytest.raises(HrabalError, match="unknown keys theme"):
         load(site_dir)
+
+
+# heading anchors
+
+
+def test_pages_know_their_heading_ids(site_dir):
+    assert load(site_dir).pages["posts/simple.md"].heading_ids == ["details"]
+
+
+def test_links_to_headings_are_checked(site_dir):
+    write_files(site_dir, {"content/oops.md": "[gone](@/posts/simple.md#nothing-here)"})
+    with pytest.raises(HrabalError, match=re.escape("oops.md: @/posts/simple.md#nothing-here points to a heading")):
+        load(site_dir)
+
+
+def test_get_url_checks_anchors_too(site_dir):
+    (site_dir / "templates" / "page.html").write_text("{{ get_url('@/posts/simple.md#nope') }}", encoding="utf-8")
+    with pytest.raises(HrabalError, match="points to a heading that isn't there"):
+        Site(site_dir).build()
+
+
+def test_insert_anchor_links_must_be_known(site_dir):
+    config = site_dir / "config.toml"
+    config.write_text('insert_anchor_links = "top"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(HrabalError, match="insert_anchor_links must be one of none, left, right, heading"):
+        load(site_dir)
+
+
+def test_anchor_links_come_from_the_config(site_dir):
+    config = site_dir / "config.toml"
+    config.write_text('insert_anchor_links = "right"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+
+    content = load(site_dir).pages["posts/simple.md"].content
+    assert '<h2 id="details">Details <a class="anchor" href="#details"' in content

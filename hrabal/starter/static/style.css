@@ -123,6 +123,11 @@ footer,
   margin-bottom: 1.5em;
 }
 
+/* the post's title, not the links inside its summary */
+.posts li > a {
+  font-weight: bold;
+}
+
 .posts time {
   margin-left: 0.5em;
 }

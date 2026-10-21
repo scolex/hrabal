@@ -68,10 +68,7 @@ def load_config(file: Path) -> Config:
     except tomllib.TOMLDecodeError as e:
         raise HrabalError(f"{file}: {e}") from None
 
-    known = {f.name for f in fields(Config)}
-    unknown = data.keys() - known
-    if unknown:
-        raise HrabalError(f"{file}: unknown keys {', '.join(sorted(unknown))} (put your own under [extra])")
+    check_keys(file, data, Config, "keys", hint=" (put your own under [extra])")
     if "base_url" not in data:
         raise HrabalError(f"{file}: base_url is required")
 
@@ -88,12 +85,17 @@ def load_config(file: Path) -> Config:
     return config
 
 
+def check_keys(file: Path, table: dict, settings, what: str, hint: str = ""):
+    # settings is the dataclass the table turns into, its fields are the keys it may have
+    unknown = table.keys() - {f.name for f in fields(settings)}
+    if unknown:
+        raise HrabalError(f"{file}: unknown {what} {', '.join(sorted(unknown))}{hint}")
+
+
 def load_theme(file: Path, table) -> ThemeConfig:
     if not isinstance(table, dict):
         raise HrabalError(f"{file}: theme settings go in a [theme] table")
-    unknown = table.keys() - {f.name for f in fields(ThemeConfig)}
-    if unknown:
-        raise HrabalError(f"{file}: unknown theme settings {', '.join(sorted(unknown))}")
+    check_keys(file, table, ThemeConfig, "theme settings")
 
     menu = []
     for item in table.get("menu", []):
@@ -110,9 +112,7 @@ def load_theme(file: Path, table) -> ThemeConfig:
 def load_link_checker(file: Path, table) -> LinkCheckerConfig:
     if not isinstance(table, dict):
         raise HrabalError(f"{file}: link checker settings go in a [link_checker] table")
-    unknown = table.keys() - {f.name for f in fields(LinkCheckerConfig)}
-    if unknown:
-        raise HrabalError(f"{file}: unknown link checker settings {', '.join(sorted(unknown))}")
+    check_keys(file, table, LinkCheckerConfig, "link checker settings")
     skip = table.get("skip_prefixes", [])
     if not isinstance(skip, list) or not all(isinstance(prefix, str) for prefix in skip):
         raise HrabalError(f'{file}: skip_prefixes is a list of addresses, like ["https://example.com/"]')
@@ -123,11 +123,10 @@ def load_taxonomy(file: Path, entry: str | dict) -> TaxonomyConfig:
     # either just a name, or a table with settings: {name = "tags", paginate_by = 10}
     if isinstance(entry, str):
         return TaxonomyConfig(entry)
+    if not isinstance(entry, dict):
+        raise HrabalError(f'{file}: a taxonomy is a name or a table, like {{ name = "tags", paginate_by = 10 }}')
 
-    known = {f.name for f in fields(TaxonomyConfig)}
-    unknown = entry.keys() - known
-    if unknown:
-        raise HrabalError(f"{file}: unknown taxonomy settings {', '.join(sorted(unknown))}")
+    check_keys(file, entry, TaxonomyConfig, "taxonomy settings")
     if "name" not in entry:
         raise HrabalError(f"{file}: every taxonomy needs a name")
 

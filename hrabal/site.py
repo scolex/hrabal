@@ -27,7 +27,7 @@ from hrabal.content import (
 from hrabal.dates import as_moment, format_date, rfc822, rfc3339
 from hrabal.i18n import Translations, base_language
 from hrabal.markdown import Markdown, has_math, has_mermaid, without_footnote_refs
-from hrabal.pagination import Paginator, pager_url, paginate
+from hrabal.pagination import pager_url, paginate
 from hrabal.search import search_index
 
 # hrabal's own look: templates and static files a site uses unless it has its own of the same name
@@ -48,6 +48,10 @@ REDIRECT = """<!doctype html>
 </body>
 </html>
 """
+
+
+def redirect_to(url: str) -> str:
+    return REDIRECT.format(url=escape(url))
 
 
 @dataclass
@@ -75,7 +79,7 @@ class Site:
         self.taxonomies: dict[str, Taxonomy] = {}
         self.loaded_translations: dict[str, Translations] = {}
         # links like @/page.md#heading, checked once every page knows its headings
-        self.anchors_to_check: list[tuple[Any, str, Page | Section, str]] = []
+        self.anchors_to_check: list[tuple[Path | str, str, Page | Section, str]] = []
 
     def build(self):
         self.load()
@@ -243,7 +247,7 @@ class Site:
             heading_ids=heading_ids,
         )
 
-    def resolve_link(self, link: str, source) -> str:
+    def resolve_link(self, link: str, source: Path | str) -> str:
         target, hash, anchor = link.removeprefix("@/").partition("#")
         if item := self.pages.get(target) or self.sections.get(target):
             if anchor:
@@ -273,18 +277,8 @@ class Site:
         self.rendered: list[str] = []  # paths of everything rendered from a template, for the sitemap
 
         for section in self.sections.values():
-            if section.paginate_by:
-                pagers = paginate(
-                    section.pages,
-                    section.paginate_by,
-                    section.path,
-                    section.permalink,
-                    paginate_path=section.paginate_path,
-                    reversed=section.paginate_reversed,
-                )
-                self.render_pagers(section.template, pagers, section.paginate_path, section=section)
-            else:
-                self.render(section.template, section.path, section=section)
+            settings = (section.paginate_by, section.paginate_path, section.paginate_reversed)
+            self.render_list(section.template, section, section.pages, *settings, section=section)
 
         for page in self.pages.values():
             self.render(page.template, page.path, page=page)
@@ -296,18 +290,9 @@ class Site:
             self.render([f"{name}/list.html", "taxonomy/list.html"], taxonomy.path, taxonomy=taxonomy)
 
             single = [f"{name}/single.html", "taxonomy/single.html"]
+            settings = (taxonomy.paginate_by, taxonomy.paginate_path)
             for term in taxonomy.terms.values():
-                if taxonomy.paginate_by:
-                    pagers = paginate(
-                        term.pages,
-                        taxonomy.paginate_by,
-                        term.path,
-                        term.permalink,
-                        paginate_path=taxonomy.paginate_path,
-                    )
-                    self.render_pagers(single, pagers, taxonomy.paginate_path, taxonomy=taxonomy, term=term)
-                else:
-                    self.render(single, term.path, taxonomy=taxonomy, term=term)
+                self.render_list(single, term, term.pages, *settings, taxonomy=taxonomy, term=term)
 
         self.write_aliases()
         # hosts show /404.html for an address that doesn't exist, it's no page of its own, so not in the sitemap
@@ -332,7 +317,7 @@ class Site:
                 if file in taken:
                     raise HrabalError(f"{item.file}: alias {alias} is already the address of something else")
                 taken.add(file)
-                self.write_file(file, REDIRECT.format(url=escape(item.permalink)))
+                self.write_file(file, redirect_to(item.permalink))
 
     def write_sitemap(self):
         dates = {page.path: page.last_changed() for page in self.pages.values()}
@@ -373,13 +358,17 @@ class Site:
             )
             self.write_file(path + name, xml)
 
-    def render_pagers(self, templates, pagers: list[Paginator], paginate_path: str, **context):
+    def render_list(self, templates, item, pages, paginate_by: int, paginate_path: str, reversed=False, **context):
+        # a section or a term: one page with everything, or pagers of paginate_by pages each
+        if not paginate_by:
+            self.render(templates, item.path, **context)
+            return
+
+        pagers = paginate(pages, paginate_by, item.path, item.permalink, paginate_path, reversed)
         for paginator in pagers:
             self.render(templates, paginator.path, paginator=paginator, **context)
-
         # page/1/ would be the same as the first pager, so it only points there, like in Zola
-        first = pagers[0]
-        self.write_html(pager_url(first.path, paginate_path, 1), REDIRECT.format(url=escape(first.first)))
+        self.write_html(pager_url(item.path, paginate_path, 1), redirect_to(item.permalink))
 
     def make_template_env(self) -> jinja2.Environment:
         env = jinja2.Environment(

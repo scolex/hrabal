@@ -32,19 +32,24 @@ class Markdown:
             self.setup_highlighting(highlight_theme)
             options["highlight"] = self.highlight_code
 
+        self.translations = translations
         self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
-        self.md.use(footnote_plugin).use(sub_plugin).use(superscript_plugin)  # H~2~O and x^2^
-        # $math$ and $$math$$, but "$5 and $10" stays money: no digit after a closing $, no space inside
+
+        # what hrabal understands on top of CommonMark: footnotes, H~2~O, x^2^, ==marks==, alerts and math.
+        # Math is $x$ and $$x$$, but "$5 and $10" stays money: no space right inside the dollars of a formula,
+        # and no digit right after its closing one.
+        self.md.use(footnote_plugin).use(sub_plugin).use(superscript_plugin)
         self.md.use(dollarmath_plugin, allow_labels=False, allow_space=False, allow_digits=False, double_inline=True)
-        self.md.add_render_rule("math_inline_double", render_math_inline_double)
         self.md.inline.ruler.before("emphasis", "mark", mark)
+        self.md.core.ruler.after("block", "github_alerts", github_alerts)
+        self.md.core.ruler.after("inline", "heading_ids", heading_ids)
+
+        # and where it writes things out its own way
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
         self.md.add_render_rule("fence", render_fence)
         self.md.add_render_rule("footnote_caption", render_footnote_caption)
-        self.translations = translations
-        self.md.core.ruler.after("block", "github_alerts", github_alerts)
-        self.md.core.ruler.after("inline", "heading_ids", heading_ids)
+        self.md.add_render_rule("math_inline_double", render_math_inline_double)
 
     def render(self, text: str, resolve_link, anchor_links="none", heading_ids: list[str] | None = None) -> str:
         # heading_ids, when given, gets the id of every heading, so links to them can be checked
@@ -76,10 +81,10 @@ class Markdown:
 def render_fence(renderer, tokens, idx, options, env):
     # mermaid diagrams and math are drawn in the browser, so they keep their source instead of getting highlighted
     token = tokens[idx]
-    language = token.info.split(maxsplit=1)[:1]
-    if language == ["mermaid"]:
+    language = token.info.strip().partition(" ")[0]
+    if language == "mermaid":
         return f"{MERMAID}{escapeHtml(token.content)}</pre>\n"
-    if language == ["math"]:  # GitHub's other way to write $$math$$
+    if language == "math":  # GitHub's other way to write $$math$$
         return f'<div class="math block">\n{escapeHtml(token.content)}</div>\n'
     return renderer.fence(tokens, idx, options, env)
 

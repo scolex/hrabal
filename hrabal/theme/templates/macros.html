@@ -10,8 +10,9 @@
 </ul>
 {% endmacro %}
 
-{# with breadcrumbs = true in [theme]: the sections above a page, from the home page down. Not the page itself, its heading comes right
-   under them. A page straight under the home page gets none, a single "Home" would say nothing. #}
+{# with breadcrumbs = true in [theme]: the sections above a page, from the home page down. Not the page
+   itself, its heading comes right under them. A page straight under the home page gets none,
+   a single "Home" would say nothing. #}
 {% macro breadcrumbs(ancestors) %}
 {% if config.theme.breadcrumbs and ancestors | length > 1 %}
 <nav class="breadcrumbs" aria-label="{{ trans('breadcrumbs') }}">
@@ -22,4 +23,15 @@
   </ol>
 </nav>
 {% endif %}
+{% endmacro %}
+
+{# tags, or whatever the taxonomy is called, in the site's language when there's a translation for it #}
+{% macro taxonomy_title(taxonomy) %}{{ trans(taxonomy.name, default=taxonomy.name | title) }}{% endmacro %}
+
+{# search.js brings it to life, in the overlay of every page and on the search page #}
+{% macro search_box(on_its_page=false) %}
+<div class="search{% if on_its_page %} search-page{% endif %}" data-index="{{ get_url('search_index.json') }}" data-empty="{{ trans('nothing_found') }}">
+  <input type="search" placeholder="{{ trans('search_placeholder') }}" aria-label="{{ trans('search') }}"{% if on_its_page %} autofocus{% endif %}>
+  <ol class="search-results"></ol>
+</div>
 {% endmacro %}

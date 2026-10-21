@@ -1,3 +1,4 @@
+{% from "macros.html" import search_box %}
 <!doctype html>
 <html lang="{{ config.language }}">
 <head>
@@ -15,7 +16,9 @@
   <script defer src="{{ get_url('copy.js') }}" data-copy="{{ trans('copy') }}" data-copied="{{ trans('copied') }}"
           data-label="{{ trans('copy_code') }}"></script>
   {% if config.generate_feeds %}
-  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url('atom.xml') }}">
+  {% for name in config.feed_filenames %}
+  <link rel="alternate" type="application/{{ 'rss' if 'rss' in name else 'atom' }}+xml" title="{{ config.title }}" href="{{ get_url(name) }}">
+  {% endfor %}
   {% endif %}
   {# both are tiny and fetch Mermaid or KaTeX only when the page has a diagram or a formula #}
   <script type="module" src="{{ get_url('mermaid.js') }}"></script>
@@ -59,10 +62,7 @@
 
   {% if config.build_search_index %}
   <dialog class="search-dialog">
-    <div class="search" data-index="{{ get_url('search_index.json') }}" data-empty="{{ trans('nothing_found') }}">
-      <input type="search" placeholder="{{ trans('search_placeholder') }}" aria-label="{{ trans('search') }}">
-      <ol class="search-results"></ol>
-    </div>
+    {{ search_box() }}
   </dialog>
   {% endif %}
 </body>

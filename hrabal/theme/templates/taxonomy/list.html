@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% from "macros.html" import taxonomy_title %}
 
-{% block title %}{{ trans(taxonomy.name, default=taxonomy.name | title) }} · {{ config.title }}{% endblock %}
+{% block title %}{{ taxonomy_title(taxonomy) }} · {{ config.title }}{% endblock %}
 
 {% block content %}
-<h1>{{ trans(taxonomy.name, default=taxonomy.name | title) }}</h1>
+<h1>{{ taxonomy_title(taxonomy) }}</h1>
 <ul>
   {% for term in taxonomy.terms.values() %}
   <li><a href="{{ term.permalink }}">{{ term.name }}</a> ({{ term.pages | length }})</li>

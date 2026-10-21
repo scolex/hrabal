@@ -71,16 +71,15 @@ function attach(box, { keepInUrl = false } = {}) {
     const found = search(await loaded, query);
 
     // built with textContent, so nothing from the index ends up as HTML
-    results.replaceChildren(
-      ...found.map((page) => {
-        const item = document.createElement("li");
-        const link = Object.assign(document.createElement("a"), { href: page.url, textContent: page.title });
-        const text = Object.assign(document.createElement("p"), { textContent: snippet(page, query) });
-        item.append(link, text);
-        return item;
-      }),
-    );
-    if (!found.length) results.replaceChildren(Object.assign(document.createElement("li"), { textContent: box.dataset.empty }));
+    const items = found.map((page) => {
+      const item = document.createElement("li");
+      const link = Object.assign(document.createElement("a"), { href: page.url, textContent: page.title });
+      const text = Object.assign(document.createElement("p"), { textContent: snippet(page, query) });
+      item.append(link, text);
+      return item;
+    });
+    if (!items.length) items.push(Object.assign(document.createElement("li"), { textContent: box.dataset.empty }));
+    results.replaceChildren(...items);
   }
 
   input.addEventListener("input", show);

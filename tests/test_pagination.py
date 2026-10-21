@@ -246,6 +246,7 @@ def test_paginate_by_must_be_a_positive_number(site_dir, value):
     [
         ('[{ name = "tags", per_page = 5 }]', "unknown taxonomy settings per_page"),
         ("[{ paginate_by = 5 }]", "every taxonomy needs a name"),
+        ("[5]", "a taxonomy is a name or a table"),
         ('[{ name = "tags", paginate_by = -5 }]', "paginate_by of tags must be a positive number"),
     ],
 )

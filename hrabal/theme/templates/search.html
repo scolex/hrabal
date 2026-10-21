@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import search_box %}
 
 {% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
 
@@ -7,8 +8,5 @@
 {{ page.content | safe }}
 
 {# the same search as the overlay, but it keeps the query in the url, so a search can be linked to #}
-<div class="search search-page" data-index="{{ get_url('search_index.json') }}" data-empty="{{ trans('nothing_found') }}">
-  <input type="search" placeholder="{{ trans('search_placeholder') }}" aria-label="{{ trans('search') }}" autofocus>
-  <ol class="search-results"></ol>
-</div>
+{{ search_box(on_its_page=true) }}
 {% endblock %}

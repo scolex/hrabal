@@ -22,27 +22,24 @@ def github_alerts(state: StateCore):
     # titles come from the translations: alert_note, alert_tip and so on
     tokens = state.tokens
     i = 0
-    while i < len(tokens):
-        if is_alert(tokens, i):
-            turn_into_alert(tokens, i, state.env["translations"])
+    while i < len(tokens):  # not a for loop, every alert gets one token more, its title
+        if match := alert_marker(tokens, i):
+            turn_into_alert(tokens, i, match, state.env["translations"])
         i += 1
 
 
-def is_alert(tokens: list[Token], i: int) -> bool:
-    return (
-        tokens[i].type == "blockquote_open"
-        and i + 2 < len(tokens)
-        and tokens[i + 1].type == "paragraph_open"
-        and tokens[i + 2].type == "inline"
-        and MARKER.fullmatch(tokens[i + 2].content.partition("\n")[0].strip()) is not None
-    )
+def alert_marker(tokens: list[Token], i: int) -> re.Match | None:
+    # the [!NOTE] on the first line of the first paragraph of a quote
+    if tokens[i].type != "blockquote_open" or i + 2 >= len(tokens):
+        return None
+    if tokens[i + 1].type != "paragraph_open" or tokens[i + 2].type != "inline":
+        return None
+    return MARKER.fullmatch(tokens[i + 2].content.partition("\n")[0].strip())
 
 
-def turn_into_alert(tokens: list[Token], i: int, translations: Translations):
+def turn_into_alert(tokens: list[Token], i: int, match: re.Match, translations: Translations):
     opening, paragraph, inline = tokens[i], tokens[i + 1], tokens[i + 2]
-    first_line, _, rest = inline.content.partition("\n")
-    match = MARKER.fullmatch(first_line.strip())
-    assert match
+    _, _, rest = inline.content.partition("\n")
     kind = match[1].lower()
     title = match[2].strip() or translations[f"alert_{kind}"]
 

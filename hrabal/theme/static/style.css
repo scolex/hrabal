@@ -1,4 +1,4 @@
-/* The starter's own rules on top of neat.css, the way Neat suggests with its custom.css. */
+/* The theme's own rules on top of neat.css, the way Neat suggests with its custom.css. */
 
 /* our own warmer colors, poured into Neat's variables so everything in neat.css picks them up */
 :root {
@@ -8,6 +8,12 @@
   --moredark: #24180f;
   --link: #8b5e34;
   --muted: #777;
+  /* the edges and titles of alerts */
+  --alert-note: #2f6690;
+  --alert-tip: #3d7a3a;
+  --alert-important: #74508f;
+  --alert-warning: #a86a12;
+  --alert-caution: #a8382c;
   border-top: none; /* neat.css draws a dark stripe across the top */
 }
 
@@ -20,6 +26,11 @@
     --moredark: #fff;
     --link: #d9a96a;
     --muted: #999;
+    --alert-note: #7fb0d8;
+    --alert-tip: #8cc487;
+    --alert-important: #b998d4;
+    --alert-warning: #e0a54c;
+    --alert-caution: #e58a7e;
   }
 }
 
@@ -31,6 +42,11 @@
   --moredark: #fff;
   --link: #d9a96a;
   --muted: #999;
+  --alert-note: #7fb0d8;
+  --alert-tip: #8cc487;
+  --alert-important: #b998d4;
+  --alert-warning: #e0a54c;
+  --alert-caution: #e58a7e;
 }
 
 :root[data-theme="light"] {
@@ -168,7 +184,7 @@ mark {
   color: inherit;
 }
 
-/* keeps H~2~O from pushing its line apart from the others */
+/* keeps H~2~O and footnote numbers from pushing their line apart from the others */
 sub,
 sup {
   line-height: 0;
@@ -238,13 +254,13 @@ footer {
   margin-top: 4em;
 }
 
-/* a drawn diagram sits on the page, not in a code box */
 /* a long formula scrolls on its own instead of widening the page */
 .math.block {
   overflow-x: auto;
   overflow-y: hidden;
 }
 
+/* a drawn diagram sits on the page, not in a code box */
 pre.mermaid {
   background-color: transparent;
   text-align: center;
@@ -289,7 +305,7 @@ pre.mermaid {
 
 /* GitHub-style alerts, > [!NOTE] and friends: a colored edge, a faint tint and a title */
 .markdown-alert {
-  --alert: #2f6690;
+  --alert: var(--alert-note);
   --alert-icon: url("alerts/note.svg");
   margin: 1.5em 0;
   padding: 0.6em 1em;
@@ -328,62 +344,23 @@ pre.mermaid {
 }
 
 .markdown-alert-tip {
-  --alert: #3d7a3a;
+  --alert: var(--alert-tip);
   --alert-icon: url("alerts/tip.svg");
 }
 
 .markdown-alert-important {
-  --alert: #74508f;
+  --alert: var(--alert-important);
   --alert-icon: url("alerts/important.svg");
 }
 
 .markdown-alert-warning {
-  --alert: #a86a12;
+  --alert: var(--alert-warning);
   --alert-icon: url("alerts/warning.svg");
 }
 
 .markdown-alert-caution {
-  --alert: #a8382c;
+  --alert: var(--alert-caution);
   --alert-icon: url("alerts/caution.svg");
-}
-
-/* lighter in the dark, the same two ways in as the rest of the dark colors */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .markdown-alert-note {
-    --alert: #7fb0d8;
-  }
-  :root:not([data-theme="light"]) .markdown-alert-tip {
-    --alert: #8cc487;
-  }
-  :root:not([data-theme="light"]) .markdown-alert-important {
-    --alert: #b998d4;
-  }
-  :root:not([data-theme="light"]) .markdown-alert-warning {
-    --alert: #e0a54c;
-  }
-  :root:not([data-theme="light"]) .markdown-alert-caution {
-    --alert: #e58a7e;
-  }
-}
-
-:root[data-theme="dark"] .markdown-alert-note {
-  --alert: #7fb0d8;
-}
-
-:root[data-theme="dark"] .markdown-alert-tip {
-  --alert: #8cc487;
-}
-
-:root[data-theme="dark"] .markdown-alert-important {
-  --alert: #b998d4;
-}
-
-:root[data-theme="dark"] .markdown-alert-warning {
-  --alert: #e0a54c;
-}
-
-:root[data-theme="dark"] .markdown-alert-caution {
-  --alert: #e58a7e;
 }
 
 details {
@@ -418,10 +395,6 @@ hr {
 }
 
 /* footnotes: a small number in the text, the notes themselves at the end of the page */
-.footnote-ref {
-  line-height: 0; /* keeps the superscript from pushing its line apart */
-}
-
 .footnote-ref a,
 .footnote-backref {
   text-decoration: none;

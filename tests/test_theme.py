@@ -73,6 +73,14 @@ copyright_since = 2020
     assert "© 2020–" in index  # noqa: RUF001, an en dash on purpose
 
 
+def test_every_feed_gets_a_link_in_the_head(plain_site):
+    configure(plain_site, 'generate_feeds = true\nfeed_filenames = ["atom.xml", "rss.xml"]\n')
+    index = html(build(plain_site))
+
+    assert 'type="application/atom+xml" title="Plain" href="https://example.com/atom.xml">' in index
+    assert 'type="application/rss+xml" title="Plain" href="https://example.com/rss.xml">' in index
+
+
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
     (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}", encoding="utf-8")

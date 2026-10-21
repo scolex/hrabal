@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
   <script src="{{ get_url('theme.js') }}"></script>
+  <script defer src="{{ get_url('copy.js') }}"></script>
   {% if config.generate_feeds %}
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url('atom.xml') }}">
   {% endif %}
@@ -44,7 +45,9 @@
   </main>
 
   <footer>
-    {{ config.author }}
+    {% set this_year = now().year %}
+    {% set since = config.extra.copyright_since or this_year %}
+    © {% if since < this_year %}{{ since }}–{% endif %}{{ this_year }} {{ config.author }}
   </footer>
 
   {% if config.build_search_index %}

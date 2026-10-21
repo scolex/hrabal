@@ -134,6 +134,45 @@ pre code {
   background-color: transparent;
 }
 
+pre {
+  border-radius: 0.375em;
+}
+
+/* copy.js wraps every code block in .code-block and adds the button */
+.code-block {
+  position: relative;
+}
+
+.code-block pre {
+  padding-right: 2.2em; /* so the button doesn't cover the end of a long first line */
+}
+
+/* copy.svg gives the shape, and copy.js sets the color to the one of the code */
+.copy-code,
+.copy-code:hover {
+  position: absolute;
+  top: 0.6em;
+  right: 0.6em;
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  background-color: currentColor;
+  -webkit-mask: url("copy.svg") center / contain no-repeat;
+  mask: url("copy.svg") center / contain no-repeat;
+  opacity: 0.5;
+}
+
+.copy-code:hover,
+.copy-code:focus-visible,
+.copy-code.copied {
+  opacity: 1;
+}
+
+.copy-code.copied {
+  -webkit-mask-image: url("check.svg");
+  mask-image: url("check.svg");
+}
+
 table {
   border-collapse: collapse;
 }

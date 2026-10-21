@@ -212,6 +212,7 @@ Everywhere you also get `config` and these functions:
 - `get_page("blog/first-post.md")`
 - `get_section("blog/_index.md")`
 - `get_taxonomy_url("tags", "books")`
+- `now()`, the time of the build, so `{{ now().year }}` keeps a copyright line current
 
 and a `date` filter, with the usual `strftime` codes: `{{ page.date | date("%d. %m. %Y") }}`.
 

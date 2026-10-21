@@ -345,6 +345,7 @@ class Site:
             get_page=self.get_page,
             get_section=self.get_section,
             get_taxonomy_url=self.get_taxonomy_url,
+            now=datetime.datetime.now,  # the time of the build, for things like the year in a copyright line
         )
         return env
 

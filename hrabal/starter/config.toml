@@ -9,4 +9,5 @@ generate_feeds = true
 build_search_index = true
 
 [extra]
+copyright_since = 2024 # the first year in the footer's copyright line, the last one is always this year
 icon = "icon.svg" # a file in static/, shown next to the title and used as the favicon, leave it out for none

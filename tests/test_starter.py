@@ -1,3 +1,4 @@
+import datetime
 import shutil
 from pathlib import Path
 
@@ -127,6 +128,32 @@ def test_starter_without_search_has_no_magnifying_glass(starter_dir):
     assert "search-open" not in index
     assert "<dialog" not in index
     assert "search.js" not in index
+
+
+def test_starter_footer_has_a_copyright_line(starter_dir):
+    Site(starter_dir).build()
+    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+
+    assert f"© 2024–{datetime.date.today().year} Your Name" in index  # noqa: RUF001, an en dash on purpose
+
+
+def test_copyright_line_without_a_start_year_has_just_this_one(starter_dir):
+    config = starter_dir / "config.toml"
+    config.write_text(config.read_text(encoding="utf-8").replace("copyright_since = 2024", "#"), encoding="utf-8")
+    Site(starter_dir).build()
+    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+
+    assert f"© {datetime.date.today().year} Your Name" in index
+
+
+def test_starter_adds_copy_buttons_to_code(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    post = (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    assert '<script defer src="https://example.com/copy.js">' in post
+    for name in ("copy.js", "copy.svg", "check.svg"):
+        assert (public / name).exists()
 
 
 def test_starter_blog_is_paginated(starter_dir):

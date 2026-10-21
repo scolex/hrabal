@@ -62,6 +62,7 @@ class Page:
     summary: str = field(default="", repr=False)
     heading_ids: list[str] = field(default_factory=list, repr=False)  # the ids links can point to with #
     has_mermaid: bool = False  # so a template loads mermaid only where a diagram needs it
+    has_math: bool = False  # and KaTeX only where there's math
     assets: list[Path] = field(default_factory=list)
     previous: Page | None = field(default=None, repr=False)
     next: Page | None = field(default=None, repr=False)
@@ -94,6 +95,7 @@ class Section:
     content: str = field(default="", repr=False)
     heading_ids: list[str] = field(default_factory=list, repr=False)
     has_mermaid: bool = False
+    has_math: bool = False
     pages: list[Page] = field(default_factory=list, repr=False)
     subsections: list[Section] = field(default_factory=list, repr=False)
     ancestors: list[Section] = field(default_factory=list, repr=False)

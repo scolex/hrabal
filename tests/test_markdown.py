@@ -2,7 +2,7 @@ import pytest
 
 from hrabal import HrabalError
 from hrabal.i18n import Translations
-from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
+from hrabal.markdown import Markdown, has_math, has_mermaid, without_footnote_refs
 
 DIAGRAM = "```mermaid\nflowchart LR\n    a[A & B] --> b\n```\n"
 
@@ -227,3 +227,32 @@ def test_footnotes_still_win_over_sup():
     html = render("Text[^a] and x^2^.\n\n[^a]: Note.\n")
     assert 'class="footnote-ref"' in html
     assert "x<sup>2</sup>" in html
+
+
+# math
+
+
+def test_inline_math():
+    html = render("Euler: $e^{i\\pi} + 1 = 0$.\n")
+    assert html == '<p>Euler: <span class="math inline">e^{i\\pi} + 1 = 0</span>.</p>\n'
+    assert has_math(html)
+
+
+@pytest.mark.parametrize("text", ["$$\nx < y\n$$\n", "```math\nx < y\n```\n"])
+def test_display_math(text):
+    html = render(text)
+    assert html == '<div class="math block">\nx &lt; y\n</div>\n'
+    assert has_math(html)
+
+
+def test_double_dollars_inside_a_sentence_are_display_math_too():
+    assert '<p>Here <span class="math block">x</span> there</p>' in render("Here $$x$$ there\n")
+
+
+@pytest.mark.parametrize("text", ["costs $5 and $10", "a $ b $ c", "price \\$5", "`$x$`"])
+def test_not_every_dollar_is_math(text):
+    assert not has_math(render(text + "\n"))
+
+
+def test_math_is_not_markdown():
+    assert '<span class="math inline">a_1 * b_2 * c</span>' in render("$a_1 * b_2 * c$\n")

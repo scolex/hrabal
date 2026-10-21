@@ -3,6 +3,7 @@ from urllib.parse import unquote
 
 from markdown_it import MarkdownIt
 from markdown_it.common.utils import escapeHtml
+from mdit_py_plugins.dollarmath import dollarmath_plugin
 from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.subscript import sub_plugin
 from mdit_py_plugins.superscript import superscript_plugin
@@ -20,6 +21,7 @@ from hrabal.i18n import ENGLISH, Translations
 from hrabal.marks import mark
 
 MERMAID = '<pre class="mermaid">'
+MATH = ('class="math inline"', 'class="math block"')  # how dollarmath_plugin marks it
 FOOTNOTE_REF = re.compile(r"\[\^[^\]\s]+\](?!:)")  # [^1] in the text, but not the [^1]: that defines it
 
 
@@ -32,6 +34,9 @@ class Markdown:
 
         self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
         self.md.use(footnote_plugin).use(sub_plugin).use(superscript_plugin)  # H~2~O and x^2^
+        # $math$ and $$math$$, but "$5 and $10" stays money: no digit after a closing $, no space inside
+        self.md.use(dollarmath_plugin, allow_labels=False, allow_space=False, allow_digits=False, double_inline=True)
+        self.md.add_render_rule("math_inline_double", render_math_inline_double)
         self.md.inline.ruler.before("emphasis", "mark", mark)
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
@@ -69,11 +74,19 @@ class Markdown:
 
 
 def render_fence(renderer, tokens, idx, options, env):
-    # mermaid diagrams are drawn in the browser, so they keep their source untouched instead of getting highlighted
+    # mermaid diagrams and math are drawn in the browser, so they keep their source instead of getting highlighted
     token = tokens[idx]
-    if token.info.split(maxsplit=1)[:1] == ["mermaid"]:
+    language = token.info.split(maxsplit=1)[:1]
+    if language == ["mermaid"]:
         return f"{MERMAID}{escapeHtml(token.content)}</pre>\n"
+    if language == ["math"]:  # GitHub's other way to write $$math$$
+        return f'<div class="math block">\n{escapeHtml(token.content)}</div>\n'
     return renderer.fence(tokens, idx, options, env)
+
+
+def render_math_inline_double(renderer, tokens, idx, options, env):
+    # $$x$$ in the middle of a sentence, a formula on a line of its own, but still in a span, since it's in a <p>
+    return f'<span class="math block">{escapeHtml(tokens[idx].content)}</span>'
 
 
 def without_footnote_refs(text: str) -> str:
@@ -88,6 +101,10 @@ def render_footnote_caption(renderer, tokens, idx, options, env):
 
 def has_mermaid(html: str) -> bool:
     return MERMAID in html
+
+
+def has_math(html: str) -> bool:
+    return any(start in html for start in MATH)
 
 
 def render_link(renderer, tokens, idx, options, env):

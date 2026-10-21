@@ -239,6 +239,12 @@ footer {
 }
 
 /* a drawn diagram sits on the page, not in a code box */
+/* a long formula scrolls on its own instead of widening the page */
+.math.block {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 pre.mermaid {
   background-color: transparent;
   text-align: center;

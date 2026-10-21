@@ -26,7 +26,7 @@ from hrabal.content import (
 )
 from hrabal.dates import as_moment, format_date, rfc822, rfc3339
 from hrabal.i18n import Translations, base_language
-from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
+from hrabal.markdown import Markdown, has_math, has_mermaid, without_footnote_refs
 from hrabal.pagination import Paginator, pager_url, paginate
 from hrabal.search import search_index
 
@@ -222,10 +222,12 @@ class Site:
         for section in self.sections.values():
             section.content = self.render_markdown(section.raw_content, section.file, section.heading_ids)
             section.has_mermaid = has_mermaid(section.content)
+            section.has_math = has_math(section.content)
 
         for page in self.pages.values():
             page.content = self.render_markdown(page.raw_content, page.file, page.heading_ids)
             page.has_mermaid = has_mermaid(page.content)
+            page.has_math = has_math(page.content)
             summary, more, _ = page.raw_content.partition("<!-- more -->")
             if more:
                 page.summary = self.render_markdown(without_footnote_refs(summary), page.file)

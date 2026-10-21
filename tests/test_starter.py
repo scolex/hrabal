@@ -61,6 +61,18 @@ def test_starter_loads_mermaid_only_where_needed(starter_dir):
     assert (public / "mermaid.js").exists()
 
 
+def test_starter_loads_katex_only_where_needed(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    assert '<script type="module" src="https://example.com/math.js">' in tour
+    assert '<span class="math inline">e^{i\\pi} + 1 = 0</span>' in tour
+    assert "$5 and $10" in tour
+    assert "math.js" not in (public / "about" / "index.html").read_text(encoding="utf-8")
+    assert (public / "math.js").exists()
+
+
 def test_starter_has_a_feed(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"

@@ -147,6 +147,17 @@ sequenceDiagram
     Browser->>Browser: reload
 ```
 
+## Math
+
+Formulas go between dollars and [KaTeX](https://katex.org/) typesets them, inside a sentence like
+$e^{i\pi} + 1 = 0$, or on a line of their own with two dollars:
+
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$$
+
+Prices stay prices, so $5 and $10 is no formula. KaTeX loads only on pages that have some math.
+
 ## Pictures
 
 ![A bale of pressed paper, tied with two straps](@/blog/2024-07-20-a-tour-of-hrabal/bale.svg)

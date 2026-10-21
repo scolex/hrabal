@@ -51,7 +51,7 @@ lives at `/hello/` and is dated May 1st, unless the front matter says otherwise.
 
 hrabal's look lives in `hrabal/theme/`: its templates, [Neat CSS](https://github.com/codazoda/neatcss)
 with a warm palette on top, light and dark with a switch, search behind a magnifying glass, a sandwich
-menu on small screens, breadcrumbs if you want them, copy buttons on code, alerts, diagrams, footnotes
+menu on small screens, breadcrumbs if you want them, copy buttons on code, alerts, diagrams, math, footnotes
 and a friendly 404 page. A site sets it up in a `[theme]` table:
 
 ```toml
@@ -213,6 +213,23 @@ hrabal leaves their source as it is, in a `<pre class="mermaid">`, and the brows
 Pages and sections with a diagram have `has_mermaid` set, so a template can load Mermaid only there.
 The theme does that with `static/mermaid.js`, which also redraws the diagrams when light and dark switch.
 It loads Mermaid from jsDelivr, pinned to one version, change the version there to upgrade.
+
+## Math
+
+```markdown
+Euler wrote $e^{i\pi} + 1 = 0$, and with two dollars a formula gets a line of its own:
+
+$$
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+$$
+```
+
+A ```` ```math ```` code block works like `$$` too, the way GitHub writes it. hrabal keeps the TeX as it
+is, in `<span class="math inline">` and `<div class="math block">`, and the browser typesets it with
+[KaTeX](https://katex.org/). Money is safe: there's no space right inside the dollars of a formula and
+no digit right after its closing one, so "$5 and $10" stays text, and `\$` is always a plain dollar.
+Pages and sections with math have `has_math` set, and the theme loads `static/math.js` only there,
+which brings KaTeX from jsDelivr, pinned to one version like Mermaid.
 
 ## Sitemap
 

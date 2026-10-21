@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
   <script src="{{ get_url('theme.js') }}"></script>
+  <script defer src="{{ get_url('menu.js') }}"></script>
   <script defer src="{{ get_url('copy.js') }}" data-copy="{{ trans('copy') }}" data-copied="{{ trans('copied') }}"
           data-label="{{ trans('copy_code') }}"></script>
   {% if config.generate_feeds %}
@@ -30,14 +31,19 @@
       {{ config.title }}
     </a>
     <nav>
-      <a href="{{ get_url('@/blog/_index.md') }}">{{ trans("blog") }}</a>
-      <a href="{{ get_url('/tags/') }}">{{ trans("tags") }}</a>
-      <a href="{{ get_url('@/about.md') }}">{{ trans("about") }}</a>
+      {# on small screens these fold into the sandwich menu, the icons after them stay #}
+      <div class="menu-links" id="menu-links">
+        <a href="{{ get_url('@/blog/_index.md') }}">{{ trans("blog") }}</a>
+        <a href="{{ get_url('/tags/') }}">{{ trans("tags") }}</a>
+        <a href="{{ get_url('@/about.md') }}">{{ trans("about") }}</a>
+      </div>
       {% if config.build_search_index %}
       {# a plain link to the search page, search.js turns it into the overlay below #}
       <a class="search-open" href="{{ get_url('@/search.md') }}" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></a>
       {% endif %}
       <button class="theme-switch" type="button" title="{{ trans('theme_switch') }}">◐</button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-links"
+              aria-label="{{ trans('menu') }}" title="{{ trans('menu') }}"></button>
     </nav>
   </header>
 

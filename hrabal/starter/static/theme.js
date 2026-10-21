@@ -3,6 +3,9 @@
 
 const root = document.documentElement;
 
+// tells style.css that scripts run, so it may fold the header links into the menu, without them they stay visible
+root.classList.add("js");
+
 try {
   const saved = localStorage.getItem("theme");
   if (saved) root.dataset.theme = saved;

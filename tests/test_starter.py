@@ -215,6 +215,34 @@ def test_no_edit_date_when_nothing_changed_after_publishing(starter_dir):
     assert "Naposledy upraveno" not in samota
 
 
+def test_starter_header_folds_its_links_into_a_menu(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+    index = (public / "index.html").read_text(encoding="utf-8")
+    links = index.split('<div class="menu-links" id="menu-links">')[1].split("</div>")[0]
+
+    assert ">Blog</a>" in links
+    assert ">O webu</a>" in links
+    assert "search-open" not in links  # the icons stay outside the menu
+    assert "theme-switch" not in links
+    assert '<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-links"' in index
+    assert 'aria-label="Nabídka"' in index
+    assert index.index("theme-switch") < index.index("menu-toggle")  # the sandwich comes last
+    assert '<script defer src="https://example.com/menu.js">' in index
+    for name in ("menu.js", "menu.svg", "close.svg"):
+        assert (public / name).exists()
+
+
+def test_menu_only_folds_when_scripts_run(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    assert 'root.classList.add("js")' in (public / "theme.js").read_text(encoding="utf-8")
+    css = (public / "style.css").read_text(encoding="utf-8")
+    assert "@media (max-width: 600px)" in css
+    assert ":root.js .menu-links {\n    display: none;" in css
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

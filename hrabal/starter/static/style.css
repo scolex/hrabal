@@ -59,6 +59,7 @@ a {
 }
 
 header {
+  position: relative; /* the open menu hangs right below it */
   display: flex;
   flex-wrap: wrap;
   align-items: center; /* baseline would line the nav up with the bottom of the icon */
@@ -80,6 +81,7 @@ header nav a + a {
 /* search.svg gives the shape and the link color fills it, so the icon follows the theme */
 .search-open {
   display: inline-block;
+  margin-left: 1em;
   width: 1.1em;
   height: 1.1em;
   background-color: var(--link);
@@ -391,4 +393,54 @@ hr {
   margin-top: 2em;
   color: var(--muted);
   font-size: 0.9em;
+}
+
+/* the sandwich menu: below 600px, the width neat.css switches at too, the header links fold behind a button.
+   Only when scripts run (theme.js marks the page with .js), so without them the links simply stay. */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  :root.js .menu-links {
+    display: none;
+  }
+
+  :root.js nav.open .menu-links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+    min-width: 10em;
+    padding: 0.8em 1.2em;
+    border: 1px solid var(--lesslight);
+    border-radius: 0.375em;
+    background-color: var(--light);
+    box-shadow: 0 0.5em 1.5em rgb(0 0 0 / 0.15);
+  }
+
+  :root.js nav.open .menu-links a + a {
+    margin-left: 0;
+  }
+
+  /* menu.svg and close.svg give the shape, like the other icons, and neat.css's button look goes */
+  :root.js .menu-toggle,
+  :root.js .menu-toggle:hover {
+    display: inline-block;
+    width: 1.3em;
+    height: 1.3em;
+    margin-left: 0.6em;
+    padding: 0;
+    background-color: var(--link);
+    -webkit-mask: url("menu.svg") center / contain no-repeat;
+    mask: url("menu.svg") center / contain no-repeat;
+  }
+
+  :root.js nav.open .menu-toggle {
+    -webkit-mask-image: url("close.svg");
+    mask-image: url("close.svg");
+  }
 }

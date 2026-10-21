@@ -142,7 +142,10 @@ pre code {
 }
 
 pre {
+  padding: 1em 1.25em;
   border-radius: 0.375em;
+  font-size: 0.85em;
+  line-height: 1.5;
 }
 
 /* a key to press, drawn as a small keycap */

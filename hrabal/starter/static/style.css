@@ -368,3 +368,21 @@ hr {
 .anchor:focus-visible {
   opacity: 1;
 }
+
+/* footnotes: a small number in the text, the notes themselves at the end of the page */
+.footnote-ref {
+  line-height: 0; /* keeps the superscript from pushing its line apart */
+}
+
+.footnote-ref a,
+.footnote-backref {
+  text-decoration: none;
+}
+
+.footnotes {
+  font-size: 0.9em;
+}
+
+.footnotes-sep {
+  margin-bottom: 1em;
+}

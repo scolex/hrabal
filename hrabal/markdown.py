@@ -1,7 +1,9 @@
+import re
 from urllib.parse import unquote
 
 from markdown_it import MarkdownIt
 from markdown_it.common.utils import escapeHtml
+from mdit_py_plugins.footnote import footnote_plugin
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -14,6 +16,7 @@ from hrabal.alerts import alert_rule
 from hrabal.anchors import heading_ids
 
 MERMAID = '<pre class="mermaid">'
+FOOTNOTE_REF = re.compile(r"\[\^[^\]\s]+\](?!:)")  # [^1] in the text, but not the [^1]: that defines it
 
 
 class Markdown:
@@ -23,10 +26,11 @@ class Markdown:
             self.setup_highlighting(highlight_theme)
             options["highlight"] = self.highlight_code
 
-        self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
+        self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"]).use(footnote_plugin)
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
         self.md.add_render_rule("fence", render_fence)
+        self.md.add_render_rule("footnote_caption", render_footnote_caption)
         self.md.core.ruler.after("block", "github_alerts", alert_rule(language))
         self.md.core.ruler.after("inline", "heading_ids", heading_ids)
 
@@ -62,6 +66,16 @@ def render_fence(renderer, tokens, idx, options, env):
     if token.info.split(maxsplit=1)[:1] == ["mermaid"]:
         return f"{MERMAID}{escapeHtml(token.content)}</pre>\n"
     return renderer.fence(tokens, idx, options, env)
+
+
+def without_footnote_refs(text: str) -> str:
+    # a summary stops at <!-- more -->, usually before the footnotes, and a number that leads nowhere helps no one
+    return FOOTNOTE_REF.sub("", text)
+
+
+def render_footnote_caption(renderer, tokens, idx, options, env):
+    # just the number, where the plugin would write [1] and [1:1] for a second reference to the same note
+    return str(tokens[idx].meta["id"] + 1)
 
 
 def has_mermaid(html: str) -> bool:

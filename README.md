@@ -78,6 +78,20 @@ Unknown keys are an error. That's on purpose, so typos don't go unnoticed.
 
 Put `<!-- more -->` in a page to mark where its summary ends.
 
+## Footnotes
+
+```markdown
+Hrabal pressed paper for thirty-five years.[^years]
+
+[^years]: In the novel, at least.
+```
+
+The reference becomes a small number linking down to the note, and the notes gather at the end of the
+page, each with a link back up. Numbers follow the order the notes are first used, the names are only
+for you. A reference without a note stays plain text, and summaries leave the numbers out, since their
+notes are usually below `<!-- more -->`. It's the footnote plugin from `mdit-py-plugins`, with
+GitHub-like markup: `sup.footnote-ref`, `section.footnotes` and `a.footnote-backref`.
+
 ## Heading anchors
 
 Every heading gets an id from its text, like in Zola: `## Quotes and alerts` becomes

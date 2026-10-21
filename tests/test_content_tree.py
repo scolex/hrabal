@@ -321,3 +321,14 @@ def test_anchor_links_come_from_the_config(site_dir):
 
     content = load(site_dir).pages["posts/simple.md"].content
     assert '<h2 id="details">Details <a class="anchor" href="#details"' in content
+
+
+def test_summary_has_no_footnote_numbers(site_dir):
+    write_files(
+        site_dir,
+        {"content/noted.md": "+++\n+++\nShort[^a] summary.\n\n<!-- more -->\n\nRest.\n\n[^a]: The note.\n"},
+    )
+    page = load(site_dir).pages["noted.md"]
+
+    assert page.summary.strip() == "<p>Short summary.</p>"
+    assert "footnote-ref" in page.content  # the page itself keeps it

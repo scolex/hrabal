@@ -1,6 +1,6 @@
 import pytest
 
-from hrabal.markdown import Markdown, has_mermaid
+from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 
 DIAGRAM = "```mermaid\nflowchart LR\n    a[A & B] --> b\n```\n"
 
@@ -140,3 +140,45 @@ def test_heading_without_letters_still_gets_an_id():
 def test_anchor_links(mode, expected):
     html = Markdown(None).render("## Intro\n", resolve_link=lambda link: link, anchor_links=mode)
     assert html.strip() == expected
+
+
+# footnotes
+
+
+def test_footnotes():
+    html = render("Text[^a] and more[^b].\n\n[^a]: First note.\n[^b]: Second note.\n")
+
+    assert '<sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup>' in html
+    assert '<sup class="footnote-ref"><a href="#fn2" id="fnref2">2</a></sup>' in html
+    assert '<section class="footnotes">' in html
+    assert '<li id="fn1" class="footnote-item"><p>First note. <a href="#fnref1" class="footnote-backref">' in html
+
+
+def test_footnotes_are_numbered_by_first_use_not_by_name():
+    html = render("One[^zebra], two[^apple].\n\n[^apple]: A.\n[^zebra]: Z.\n")
+    assert html.index('<li id="fn1" class="footnote-item"><p>Z.') < html.index(
+        '<li id="fn2" class="footnote-item"><p>A.'
+    )
+
+
+def test_second_reference_to_a_note_shows_the_same_number():
+    html = render("Here[^a] and here[^a].\n\n[^a]: Note.\n")
+
+    assert html.count(">1</a></sup>") == 2
+    assert ">1:1<" not in html  # only the ids tell the two apart, readers see 1 twice
+
+
+def test_reference_without_a_note_stays_text():
+    html = render("Nothing[^missing] here.\n")
+
+    assert "[^missing]" in html
+    assert "footnotes" not in html
+
+
+def test_footnote_reference_in_code_stays_code():
+    assert "footnote-ref" not in render("`[^a]`\n\n[^a]: Note.\n")
+
+
+def test_summaries_lose_their_footnote_references():
+    text = "Summary[^a] with[^long-name] notes.\n\n[^a]: Kept, it's not a reference.\n"
+    assert without_footnote_refs(text) == "Summary with notes.\n\n[^a]: Kept, it's not a reference.\n"

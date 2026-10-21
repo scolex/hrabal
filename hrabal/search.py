@@ -10,20 +10,22 @@ BLOCKS = {"p", "br", "li", "pre", "div", "blockquote", "table", "tr", "td", "th"
 
 
 class TextOnly(HTMLParser):
-    # keeps what a reader sees, minus scripts, styles and the source of mermaid diagrams
+    # keeps what a reader sees, minus scripts, styles, the source of mermaid diagrams and footnote back links
     def __init__(self):
         super().__init__()
         self.parts: list[str] = []
         self.skipping = 0
 
     def handle_starttag(self, tag, attrs):
-        if tag in ("script", "style") or (tag == "pre" and ("class", "mermaid") in attrs):
+        mermaid = tag == "pre" and ("class", "mermaid") in attrs
+        back_to_text = tag == "a" and ("class", "footnote-backref") in attrs  # the ↩ after a footnote
+        if tag in ("script", "style") or mermaid or back_to_text:
             self.skipping += 1
         if tag in BLOCKS:
             self.parts.append(" ")
 
     def handle_endtag(self, tag):
-        if self.skipping and tag in ("script", "style", "pre"):
+        if self.skipping and tag in ("script", "style", "pre", "a"):
             self.skipping -= 1
         if tag in BLOCKS:
             self.parts.append(" ")

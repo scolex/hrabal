@@ -24,7 +24,7 @@ from hrabal.content import (
     split_date,
 )
 from hrabal.dates import format_date, rfc822, rfc3339
-from hrabal.markdown import Markdown, has_mermaid
+from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 from hrabal.pagination import Paginator, pager_url, paginate
 from hrabal.search import search_index
 
@@ -214,7 +214,7 @@ class Site:
             page.has_mermaid = has_mermaid(page.content)
             summary, more, _ = page.raw_content.partition("<!-- more -->")
             if more:
-                page.summary = self.render_markdown(summary, page.file)
+                page.summary = self.render_markdown(without_footnote_refs(summary), page.file)
 
         # only now does every page know its headings
         self.check_anchors()

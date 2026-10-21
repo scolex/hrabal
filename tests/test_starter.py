@@ -176,6 +176,7 @@ def test_starter_tour_shows_off_what_a_post_can_hold(starter_dir):
     assert "<details>" in tour
     assert '<h2 id="tables">Tables <a class="anchor" href="#tables"' in tour
     assert 'href="https://example.com/blog/a-tour-of-hrabal/#code"' in tour
+    assert tour.count('class="footnote-item"') == 2
 
 
 def test_starter_has_an_icon_for_every_alert(starter_dir):

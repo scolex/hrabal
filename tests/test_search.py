@@ -80,3 +80,9 @@ def test_index_is_off_unless_asked_for(site_dir):
 def test_page_text():
     html = "<h1>Title</h1>\n<p>Some <em>nice</em>\ntext.</p><script>alert(1)</script><style>p {}</style><p>End</p>"
     assert page_text(html) == "Title Some nice text. End"
+
+
+def test_footnote_back_links_stay_out_of_the_text():
+    html = '<p>Text<sup class="footnote-ref"><a href="#fn1">1</a></sup>.</p><section class="footnotes"><ol>'
+    html += '<li><p>The note. <a href="#fnref1" class="footnote-backref">↩︎</a></p></li></ol></section>'
+    assert page_text(html) == "Text1. The note."

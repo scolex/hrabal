@@ -18,7 +18,10 @@ Everything above the `more` comment is the summary, the part you see in the list
 
 Paragraphs are plain text with an empty line between them. Inside a paragraph, words can be **bold**,
 *italic* or ~~struck out~~, `code` can be marked, and links go anywhere on the web, like to
-[Zola](https://www.getzola.org/), which hrabal borrows a lot from.
+[Zola](https://www.getzola.org/), which hrabal borrows a lot from.[^zola]
+
+A footnote is a `[^name]` in the text and a `[^name]: …` line anywhere in the post.[^name] It gets
+a number of its own and ends up at the bottom of the page, with a link back to where it was used.
 
 Links to other pages of this site use their file path, like [the about page](@/about.md) or
 [the first post](@/blog/prilis-hlucna-samota.md). hrabal checks every one of them during the build,
@@ -159,3 +162,6 @@ Hidden until clicked. Markdown still works in here, **see**?
 ---
 
 That's the tour. The [search](@/search.md) finds this post too, try `bale` or `diagram`.
+
+[^zola]: Zola is a static site generator written in Rust, hrabal is a much smaller one written in Python.
+[^name]: The name between `[^` and `]` is only for you, readers see numbers in the order the notes appear.

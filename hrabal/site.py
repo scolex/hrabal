@@ -274,6 +274,8 @@ class Site:
         self.write_feeds()
         if self.config.generate_sitemap:
             self.write_sitemap()
+        if self.config.generate_robots_txt:
+            self.write_file("/robots.txt", self.render_template("robots.txt", "/robots.txt"))
         if self.config.build_search_index:
             self.write_file("/search_index.json", search_index(list(self.pages.values())))
 

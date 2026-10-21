@@ -24,6 +24,7 @@ class Config:
     highlight_code: bool = True
     highlight_theme: str = "monokai"
     generate_sitemap: bool = True
+    generate_robots_txt: bool = True
     generate_feeds: bool = False
     feed_filenames: list[str] = field(default_factory=lambda: ["atom.xml"])
     feed_limit: int = 0  # 0 puts every page with a date in the feed

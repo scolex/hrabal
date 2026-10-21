@@ -111,6 +111,21 @@ To change how it looks, put your own `templates/sitemap.xml` in the site. It get
 each with a `permalink` and a `date` (or nothing). `generate_sitemap = false` in `config.toml`
 turns it off.
 
+## robots.txt
+
+Every build also writes a `robots.txt` that lets every crawler in and tells them where the sitemap is:
+
+```
+User-agent: *
+Allow: /
+Sitemap: https://example.com/sitemap.xml
+```
+
+The `Sitemap` line is left out when there's no sitemap. A site's own `templates/robots.txt` replaces it,
+to keep some crawler or folder out, and it gets `config` and `get_url` like every template.
+`generate_robots_txt = false` turns it off. Crawlers only read `robots.txt` at the root of a domain,
+so for a site under a path like `example.com/blog/` it's of no use.
+
 ## Feeds
 
 Atom by default, RSS if you like, or both:

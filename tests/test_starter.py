@@ -1,6 +1,5 @@
 import datetime
 import os
-import re
 import shutil
 from pathlib import Path
 
@@ -89,8 +88,7 @@ def test_starter_icon_shows_next_to_the_title_and_as_favicon(starter_dir):
 
 def test_starter_icon_can_be_left_out(starter_dir):
     config = starter_dir / "config.toml"
-    text = config.read_text(encoding="utf-8")
-    config.write_text(re.sub(r"^icon = .*\n", "", text, flags=re.MULTILINE), encoding="utf-8")
+    config.write_text(config.read_text(encoding="utf-8").replace('icon = "icon.svg"', 'icon = ""'), encoding="utf-8")
     Site(starter_dir).build()
 
     index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
@@ -323,7 +321,8 @@ def test_starter_switches_to_english_with_one_line(starter_dir):
     index = (public / "index.html").read_text(encoding="utf-8")
 
     assert '<html lang="en">' in index
-    assert ">Tags</a>" in index
+    assert ">Štítky</a>" in index  # the menu says what [theme] says, everything hrabal writes itself switches
+    assert "<h1>Tags</h1>" in (public / "tags" / "index.html").read_text(encoding="utf-8")
     assert "<h2>Latest posts</h2>" in index
     assert "<time>July 20, 2024</time>" in index
     tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")

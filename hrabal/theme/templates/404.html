@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ trans("not_found") }} · {{ config.title }}{% endblock %}
+
+{% block content %}
+<div class="not-found">
+  <p class="not-found-code">404</p>
+  <h1>{{ trans("not_found") }}</h1>
+  <p>{{ trans("not_found_text") }}</p>
+  {% if config.build_search_index %}
+  <p>{{ trans("not_found_search") }}</p>
+  {% endif %}
+  <p><a class="button" href="{{ get_url('/') }}">{{ trans("back_home") }}</a></p>
+</div>
+{% endblock %}

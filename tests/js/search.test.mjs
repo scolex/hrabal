@@ -1,8 +1,8 @@
-// The starter's search script, run with: docker compose run --rm js
+// The theme's search script, run with: docker compose run --rm js
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { fold, prepare, search, snippet } from "../../hrabal/starter/static/search.js";
+import { fold, prepare, search, snippet } from "../../hrabal/theme/static/search.js";
 
 const pages = prepare([
   {

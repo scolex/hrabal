@@ -42,6 +42,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def send_error(self, code, message=None, explain=None):
+        # the site's own 404.html, like a real host would show it, instead of Python's plain error page
+        page = Path(self.directory) / "404.html"
+        if code != 404 or not page.is_file():
+            return super().send_error(code, message, explain)
+
+        body = page.read_bytes()
+        self.send_response(404)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
     def end_headers(self):
         # without this a browser can keep an old stylesheet after the live reload
         self.send_header("Cache-Control", "no-cache")

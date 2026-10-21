@@ -4,6 +4,8 @@
 {% block content %}
 {{ section.content | safe }}
 
+{% if config.theme.home_posts %}
 <h2>{{ trans("latest_posts") }}</h2>
-{{ post_list(get_section("blog/_index.md").pages[:5]) }}
+{{ post_list(get_section(config.theme.home_posts).pages[:5]) }}
+{% endif %}
 {% endblock %}

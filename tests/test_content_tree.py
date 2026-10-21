@@ -285,8 +285,8 @@ def test_unknown_front_matter_is_an_error(site_dir):
 
 def test_unknown_config_key_is_an_error(site_dir):
     config = site_dir / "config.toml"
-    config.write_text('theme = "fancy"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
-    with pytest.raises(HrabalError, match="unknown keys theme"):
+    config.write_text('colour = "red"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(HrabalError, match="unknown keys colour"):
         load(site_dir)
 
 

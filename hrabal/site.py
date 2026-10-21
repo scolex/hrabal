@@ -29,7 +29,10 @@ from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 from hrabal.pagination import Paginator, pager_url, paginate
 from hrabal.search import search_index
 
-BUILTIN_TEMPLATES = Path(__file__).parent / "templates"
+# hrabal's own look: templates and static files a site uses unless it has its own of the same name
+THEME = Path(__file__).parent / "theme"
+# what every site gets whatever it looks like: sitemap.xml, atom.xml, rss.xml and robots.txt
+BUILT_IN_TEMPLATES = Path(__file__).parent / "templates"
 
 REDIRECT = """<!doctype html>
 <html>
@@ -253,9 +256,10 @@ class Site:
         return self.config.base_url.rstrip("/") + path
 
     def copy_static(self):
-        static = self.root / "static"
-        if static.is_dir():
-            shutil.copytree(static, self.output_dir, dirs_exist_ok=True)
+        # the theme's files first, so a site's own file of the same name replaces it
+        for static in (THEME / "static", self.root / "static"):
+            if static.is_dir():
+                shutil.copytree(static, self.output_dir, dirs_exist_ok=True)
 
     def write(self):
         self.templates = self.make_template_env()
@@ -297,6 +301,9 @@ class Site:
                     self.render_pagers(single, pagers, taxonomy.paginate_path, taxonomy=taxonomy, term=term)
                 else:
                     self.render(single, term.path, taxonomy=taxonomy, term=term)
+
+        # hosts show /404.html for an address that doesn't exist, it's no page of its own, so not in the sitemap
+        self.write_file("/404.html", self.finish_html(self.render_template("404.html", "/404.html")))
 
         self.check_anchors()  # the ones from get_url() in templates
         self.write_feeds()
@@ -356,8 +363,8 @@ class Site:
 
     def make_template_env(self) -> jinja2.Environment:
         env = jinja2.Environment(
-            # the site's own templates first, then hrabal's built-in ones like sitemap.xml
-            loader=jinja2.FileSystemLoader([self.root / "templates", BUILTIN_TEMPLATES]),
+            # the site's own templates first, then the theme's and hrabal's, so a site replaces just the ones it wants
+            loader=jinja2.FileSystemLoader([self.root / "templates", THEME / "templates", BUILT_IN_TEMPLATES]),
             autoescape=jinja2.select_autoescape(["html", "xml"]),
             trim_blocks=True,
             lstrip_blocks=True,
@@ -388,16 +395,21 @@ class Site:
             self.loaded_translations[language] = Translations(language, self.config.translations)
         return self.loaded_translations[language]
 
-    def trans(self, key: str, lang: str | None = None):
-        # in templates: {{ trans("newer") }}, or {{ trans("newer", lang="en") }} for another language
-        return self.translations(lang)[key]
+    def trans(self, key: str, lang: str | None = None, default: str | None = None):
+        # in templates: {{ trans("newer") }}, trans("newer", lang="en") for another language,
+        # or trans(key, default="…") for a string that may well not have a translation
+        translations = self.translations(lang)
+        if default is not None and key not in translations.strings:
+            return default
+        return translations[key]
 
     def render(self, templates, path: str, **context):
-        html = self.render_template(templates, path, **context)
-        if self.inject_html:
-            html = html.replace("</body>", self.inject_html + "</body>")
-        self.write_html(path, html)
+        self.write_html(path, self.finish_html(self.render_template(templates, path, **context)))
         self.rendered.append(path)
+
+    def finish_html(self, html: str) -> str:
+        # hrabal serve puts its live reload in here
+        return html.replace("</body>", self.inject_html + "</body>") if self.inject_html else html
 
     def render_template(self, templates, path: str, **context) -> str:
         try:
@@ -422,6 +434,8 @@ class Site:
     def get_url(self, path: str) -> str:
         if path.startswith("@/"):
             return self.resolve_link(path, "template")
+        if "://" in path:
+            return path  # somewhere else on the web, like a menu item pointing away
         return self.permalink("/" + path.lstrip("/"))
 
     def get_page(self, path: str) -> Page:

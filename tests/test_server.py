@@ -1,6 +1,7 @@
 import functools
 import http.server
 import threading
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -30,3 +31,19 @@ def test_version_tells_pages_when_to_reload(server_url, monkeypatch):
     with urllib.request.urlopen(f"{server_url}/__hrabal/version") as response:
         assert response.read() == b"7"
         assert response.headers["Cache-Control"] == "no-cache"
+
+
+def test_missing_page_gets_the_sites_404_page(server_url, tmp_path):
+    (tmp_path / "404.html").write_text("<h1>Page not found</h1>", encoding="utf-8")
+
+    with pytest.raises(urllib.error.HTTPError) as error:
+        urllib.request.urlopen(f"{server_url}/nowhere/")
+    assert error.value.code == 404
+    assert error.value.read() == b"<h1>Page not found</h1>"
+
+
+def test_without_a_404_page_the_plain_error_stays(server_url):
+    with pytest.raises(urllib.error.HTTPError) as error:
+        urllib.request.urlopen(f"{server_url}/nowhere/")
+    assert error.value.code == 404
+    assert b"Page not found" not in error.value.read()

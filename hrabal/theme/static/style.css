@@ -449,3 +449,25 @@ hr {
     mask-image: url("close.svg");
   }
 }
+
+/* the page hosts show for an address that doesn't exist */
+.not-found {
+  margin: 4em 0;
+  text-align: center;
+}
+
+.not-found-code {
+  margin: 0;
+  color: color-mix(in srgb, var(--link) 35%, transparent);
+  font-size: 6em;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.not-found h1 {
+  margin-top: 0.3em;
+}
+
+.not-found .button {
+  margin-top: 1em;
+}

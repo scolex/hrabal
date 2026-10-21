@@ -15,6 +15,21 @@ class TaxonomyConfig:
 
 
 @dataclass
+class MenuItem:
+    title: str
+    url: str  # @/about.md, /tags/ or a whole https:// address
+
+
+@dataclass
+class ThemeConfig:
+    # settings of hrabal's own look, the [theme] table in config.toml
+    menu: list[MenuItem] = field(default_factory=list)
+    home_posts: str = ""  # the section whose newest posts the home page lists, like "blog/_index.md"
+    icon: str = "icon.svg"  # a file in static/, shown before the title and as the favicon, "" for none
+    copyright_since: int = 0  # the first year in the footer, 0 shows just this year
+
+
+@dataclass
 class Config:
     base_url: str
     title: str = ""
@@ -31,6 +46,7 @@ class Config:
     feed_filenames: list[str] = field(default_factory=lambda: ["atom.xml"])
     feed_limit: int = 0  # 0 puts every page with a date in the feed
     build_search_index: bool = False
+    theme: ThemeConfig = field(default_factory=ThemeConfig)
     translations: dict[str, dict] = field(default_factory=dict)  # [translations.cs] and so on, see i18n.py
     extra: dict = field(default_factory=dict)
 
@@ -52,6 +68,7 @@ def load_config(file: Path) -> Config:
         raise HrabalError(f"{file}: base_url is required")
 
     data["taxonomies"] = [load_taxonomy(file, entry) for entry in data.get("taxonomies", [])]
+    data["theme"] = load_theme(file, data.get("theme", {}))
     config = Config(**data)
     if not all(isinstance(strings, dict) for strings in config.translations.values()):
         raise HrabalError(f"{file}: translations go in a table per language, like [translations.cs]")
@@ -60,6 +77,23 @@ def load_config(file: Path) -> Config:
     if not isinstance(config.feed_limit, int) or config.feed_limit < 0:
         raise HrabalError(f"{file}: feed_limit must be a positive number, or 0 for no limit")
     return config
+
+
+def load_theme(file: Path, table) -> ThemeConfig:
+    if not isinstance(table, dict):
+        raise HrabalError(f"{file}: theme settings go in a [theme] table")
+    unknown = table.keys() - {f.name for f in fields(ThemeConfig)}
+    if unknown:
+        raise HrabalError(f"{file}: unknown theme settings {', '.join(sorted(unknown))}")
+
+    menu = []
+    for item in table.get("menu", []):
+        if not isinstance(item, dict) or item.keys() != {"title", "url"}:
+            raise HrabalError(
+                f'{file}: every menu item needs a title and a url, like {{ title = "Blog", url = "/blog/" }}'
+            )
+        menu.append(MenuItem(**item))
+    return ThemeConfig(**(table | {"menu": menu}))
 
 
 def load_taxonomy(file: Path, entry: str | dict) -> TaxonomyConfig:

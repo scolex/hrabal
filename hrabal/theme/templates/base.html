@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
-  {% if config.extra.icon %}
-  <link rel="icon" href="{{ get_url(config.extra.icon) }}"{% if config.extra.icon.endswith(".svg") %} type="image/svg+xml"{% endif %}>
+  {% if config.theme.icon %}
+  <link rel="icon" href="{{ get_url(config.theme.icon) }}"{% if config.theme.icon.endswith(".svg") %} type="image/svg+xml"{% endif %}>
   {% endif %}
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
@@ -27,19 +27,19 @@
 <body>
   <header>
     <a class="site-title" href="{{ get_url('/') }}">
-      {% if config.extra.icon %}<img src="{{ get_url(config.extra.icon) }}" alt="">{% endif %}
+      {% if config.theme.icon %}<img src="{{ get_url(config.theme.icon) }}" alt="">{% endif %}
       {{ config.title }}
     </a>
     <nav>
-      {# on small screens these fold into the sandwich menu, the icons after them stay #}
+      {# menu in [theme], on small screens it folds into the sandwich menu, the icons after it stay #}
       <div class="menu-links" id="menu-links">
-        <a href="{{ get_url('@/blog/_index.md') }}">{{ trans("blog") }}</a>
-        <a href="{{ get_url('/tags/') }}">{{ trans("tags") }}</a>
-        <a href="{{ get_url('@/about.md') }}">{{ trans("about") }}</a>
+        {% for item in config.theme.menu %}
+        <a href="{{ get_url(item.url) }}">{{ item.title }}</a>
+        {% endfor %}
       </div>
       {% if config.build_search_index %}
       {# a plain link to the search page, search.js turns it into the overlay below #}
-      <a class="search-open" href="{{ get_url('@/search.md') }}" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></a>
+      <a class="search-open" href="{{ get_url('/search/') }}" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></a>
       {% endif %}
       <button class="theme-switch" type="button" title="{{ trans('theme_switch') }}">◐</button>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-links"
@@ -53,7 +53,7 @@
 
   <footer>
     {% set this_year = now().year %}
-    {% set since = config.extra.copyright_since or this_year %}
+    {% set since = config.theme.copyright_since or this_year %}
     © {% if since < this_year %}{{ since }}–{% endif %}{{ this_year }} {{ config.author }}
   </footer>
 

@@ -1,7 +1,8 @@
 # hrabal
 
 A small static site generator, heavily inspired by [Zola](https://www.getzola.org/).
-Markdown in, HTML out, Jinja templates in between.
+Markdown in, HTML out, Jinja templates in between. It's opinionated: hrabal comes with its own look,
+so a site is just its `config.toml` and its `content/`, and replaces only the bits of the look it wants to.
 
 Named after Bohumil Hrabal, who knew a thing or two about pressing a lot of paper into neat bales.
 
@@ -16,8 +17,9 @@ cd site
 hrabal serve
 ```
 
-Open http://127.0.0.1:1111/ and start editing. The browser reloads after every change.
-When you're happy, `hrabal build` writes the finished site into `public/`.
+`hrabal init` writes a `config.toml` and a `content/` with a few posts to start from, one of them a tour
+of everything a page can hold. Open http://127.0.0.1:1111/ and start editing. The browser reloads after
+every change. When you're happy, `hrabal build` writes the finished site into `public/`.
 
 ## How a site looks
 
@@ -33,8 +35,8 @@ site/
 │       └── with-pictures/
 │           ├── index.md     -> /blog/with-pictures/
 │           └── photo.jpg    -> /blog/with-pictures/photo.jpg
-├── templates/
-└── static/                  copied to the output as is
+├── templates/               optional, replaces templates of the theme
+└── static/                  optional, copied to the output as is, replaces the theme's files
 ```
 
 Every folder in `content/` is a **section** and every other Markdown file is a **page**.
@@ -44,6 +46,31 @@ A folder can't have both, it's either a section or a page. Files starting with a
 
 A date at the start of a file name becomes the page's date: `2024-05-01_hello.md` (or `2024-05-01-hello.md`)
 lives at `/hello/` and is dated May 1st, unless the front matter says otherwise. Works for page folders too.
+
+## The theme
+
+hrabal's look lives in `hrabal/theme/`: its templates, [Neat CSS](https://github.com/codazoda/neatcss)
+with a warm palette on top, light and dark with a switch, search behind a magnifying glass, a sandwich
+menu on small screens, copy buttons on code, alerts, diagrams, footnotes and a friendly 404 page.
+A site sets it up in a
+`[theme]` table:
+
+```toml
+[theme]
+menu = [                              # the links in the header, none without it
+    { title = "Blog", url = "@/blog/_index.md" },
+    { title = "Tags", url = "/tags/" },
+    { title = "GitHub", url = "https://github.com/" },
+]
+home_posts = "blog/_index.md"         # the section whose newest posts the home page lists
+icon = "icon.svg"                     # before the title and as the favicon, "" for none, the default is a bale
+copyright_since = 2024                # the first year in the footer, the last one is always this year
+```
+
+Its words follow the site's language, see [Languages](#languages). To change any part of it, put a file
+of the same name in the site's `templates/` or `static/`: a `templates/page.html` replaces how pages look,
+a `static/style.css` replaces the theme's colors and spacing, and everything else keeps coming from hrabal.
+The templates and what they get are described under [Templates](#templates).
 
 ## Front matter
 
@@ -81,7 +108,7 @@ Unknown keys are an error. That's on purpose, so typos don't go unnoticed.
 modified. Keep in mind that a fresh clone, in CI for example, gives every file the time of the clone,
 so for a site built that way, `updated` in the front matter is what keeps the dates honest.
 The sitemap's `lastmod` and Atom's `<updated>` use the later of `date` and `updated`, which templates
-get as `page.last_changed()`. The starter prints "Last edited" under a post that changed after its date.
+get as `page.last_changed()`. The theme prints "Last edited" under a post that changed after its date.
 
 Put `<!-- more -->` in a page to mark where its summary ends.
 
@@ -107,7 +134,7 @@ heading with the same text gets `-1`, `-2` and so on. A page's ids are in `page.
 
 `insert_anchor_links` in `config.toml` adds a link to each heading too: `"none"` (the default),
 `"left"` or `"right"` for a small `#` next to it, or `"heading"` to make the whole heading the link.
-The links have the class `anchor`, the starter shows its `#` only on hover.
+The links have the class `anchor`, the theme shows its `#` only on hover.
 
 Links to a heading are checked like the rest: `[tables](@/blog/tour/index.md#tables)` stops the build
 when the tour has no heading that becomes `tables`.
@@ -127,7 +154,7 @@ Note, tip and warning boxes are written the way GitHub does it, as a blockquote 
 The markers are `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]`. Without a title of
 its own an alert gets one in the site's `language`, `alert_note`, `alert_warning` and so on from the translations.
 The HTML is GitHub's too, `<div class="markdown-alert markdown-alert-warning">` with a
-`<p class="markdown-alert-title">`, so CSS made for GitHub alerts works. The starter has its own.
+`<p class="markdown-alert-title">`, so CSS made for GitHub alerts works. The theme has its own, with icons.
 
 ## Links
 
@@ -149,7 +176,7 @@ flowchart LR
 
 hrabal leaves their source as it is, in a `<pre class="mermaid">`, and the browser draws them.
 Pages and sections with a diagram have `has_mermaid` set, so a template can load Mermaid only there.
-The starter does that with `static/mermaid.js`, which also redraws the diagrams when the theme switches.
+The theme does that with `static/mermaid.js`, which also redraws the diagrams when light and dark switch.
 It loads Mermaid from jsDelivr, pinned to one version, change the version there to upgrade.
 
 ## Sitemap
@@ -210,11 +237,11 @@ With `build_search_index = true`, every build writes `search_index.json`, one en
 `text` is the page without its HTML, scripts or diagram source, cut at 5000 characters.
 `search = false` in a page's front matter keeps it out, drafts are in only when they're built.
 
-hrabal only writes the index, the searching happens in the browser, in the starter's `static/search.js`.
+hrabal only writes the index, the searching happens in the browser, in the theme's `static/search.js`.
 It fetches the index on the first keystroke, ignores case and diacritics (`zlutoucky kun` finds
 "Žluťoučký kůň"), wants every word to match the start of a word, and ranks title above tags above text.
 
-In the starter, the magnifying glass in the header opens search in an overlay, and so do `/` and
+In the theme, the magnifying glass in the header opens search in an overlay, and so do `/` and
 Ctrl/⌘+K. Esc or a click outside closes it. Without JavaScript the same icon just goes to the search
 page (`content/search.md` with the `search.html` template), which also keeps the query in the url:
 `/search/?q=hrabal` opens with results.
@@ -247,6 +274,11 @@ Without `paginate_by` there's no `paginator` at all, and `section.pages` always 
 
 ## Templates
 
+The theme has all of these, and a site's own `templates/` replaces any of them one by one. hrabal looks
+in the site's `templates/` first, then in the theme's `hrabal/theme/templates/`, and last in
+`hrabal/templates/`, which holds what every site gets whatever it looks like: `sitemap.xml`,
+`atom.xml`, `rss.xml` and `robots.txt`. Those can be replaced the same way.
+
 | Template                    | Used for                    | Variables                       |
 |-----------------------------|-----------------------------|---------------------------------|
 | `index.html`                | the root section            | `section`, `paginator`          |
@@ -254,6 +286,7 @@ Without `paginate_by` there's no `paginator` at all, and `section.pages` always 
 | `page.html`                 | pages                       | `page`                          |
 | `taxonomy/list.html`        | `/tags/`                    | `taxonomy`                      |
 | `taxonomy/single.html`      | `/tags/books/`              | `taxonomy`, `term`, `paginator` |
+| `404.html`                  | missing pages, `/404.html`  | nothing of its own              |
 
 `tags/list.html` and `tags/single.html` take precedence if a taxonomy needs its own look.
 
@@ -290,30 +323,28 @@ Sections have `title`, `description`, `content`, `pages`, `subsections`, `permal
 ## Languages
 
 A site has one language, `language` in `config.toml`, and everything hrabal writes in words follows it:
-month and day names, the date formats `date_long` and `date_short`, alert titles and the label of
-heading links. hrabal brings those in English and Czech, in `hrabal/translations/`.
+month and day names, the date formats `date_long` and `date_short`, alert titles, the label of
+heading links and every word of the theme, like "Newer", "Search…" or "Last edited". hrabal brings
+all of those in English and Czech, in `hrabal/translations/`. Only the menu says exactly what `[theme]` says.
 
-A site adds strings of its own, or overrides hrabal's, in a table per language:
+A site overrides hrabal's strings, or adds its own for its own templates, in a table per language:
 
 ```toml
 language = "cs"
 
 [translations.cs]
-newer = "Novější"
-alert_tip = "Rada"          # instead of hrabal's own "Tip"
-date_long = "%-d. %B %Y"
-
-[translations.en]
-newer = "Newer"
+newer = "Mladší"            # instead of hrabal's own "Novější"
+alert_tip = "Rada"          # instead of "Tip"
+date_long = "%-d. %-m. %Y"
 ```
 
-Templates read them with `trans("newer")`, or `trans("newer", lang="en")` for another language.
+Templates read them with `trans("newer")`, or `trans("newer", lang="en")` for another language,
+or `trans(key, default="…")` for one that may not have a translation.
 A string that's missing stops the build and says which table to add it to, so a typo in a template
 can't slip through. That's also how to write a site in a language hrabal doesn't know yet: give
 `[translations.de]` the `months`, `days` and the other keys from `hrabal/translations/en.toml`.
 
-The starter keeps all its interface strings there, in Czech and English, so switching `language`
-switches the whole site. Its scripts get theirs through `data-` attributes in `base.html`.
+The theme's scripts get their words through `data-` attributes in `base.html`, so they follow too.
 
 ## Development
 
@@ -334,7 +365,7 @@ docker compose run --rm dev pytest
 docker compose run --rm dev ruff format
 docker compose run --rm dev ruff check
 docker compose run --rm dev ty check
-docker compose run --rm js              # the starter's JavaScript, with node's test runner
+docker compose run --rm js              # the theme's JavaScript, with node's test runner
 ```
 
 Most tests run against `tests/test_site/`, a small site in the spirit of Zola's own test site.

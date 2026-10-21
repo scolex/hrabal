@@ -5,51 +5,22 @@ author = "Your Name"
 taxonomies = ["tags"]
 highlight_theme = "monokai"
 insert_anchor_links = "right"
-language = "cs"
+language = "cs" # "en" switches everything hrabal writes to English
 generate_feeds = true
 build_search_index = true
 
-[extra]
-copyright_since = 2024 # the first year in the footer's copyright line, the last one is always this year
-icon = "icon.svg" # a file in static/, shown next to the title and used as the favicon, leave it out for none
+# hrabal's own look. Any of its templates or static files can be replaced by putting a file
+# of the same name in templates/ or static/ here, the rest comes from hrabal.
+[theme]
+menu = [
+    { title = "Blog", url = "@/blog/_index.md" },
+    { title = "Štítky", url = "/tags/" },
+    { title = "O webu", url = "@/about.md" },
+]
+home_posts = "blog/_index.md" # the section whose newest posts the home page lists
+icon = "icon.svg" # shown before the title and as the favicon, "" for none
+copyright_since = 2024 # the first year in the footer, the last one is always this year
 
-# the starter's own strings, read in templates with trans("key"). hrabal brings month names, date formats
-# (date_long, date_short) and alert titles itself, and any of those can be overridden here as well.
-# Switch language above to "en" and the site follows.
-[translations.cs]
-blog = "Blog"
-tags = "Štítky"
-all_tags = "Všechny štítky"
-about = "O webu"
-search = "Hledat"
-search_placeholder = "Hledat…"
-nothing_found = "Nic jsme nenašli."
-theme_switch = "Přepnout světlý a tmavý vzhled"
-menu = "Nabídka"
-latest_posts = "Nejnovější příspěvky"
-more = "Další"
-newer = "Novější"
-older = "Starší"
-last_edited = "Naposledy upraveno"
-copy = "Kopírovat"
-copied = "Zkopírováno"
-copy_code = "Kopírovat kód"
-
-[translations.en]
-blog = "Blog"
-tags = "Tags"
-all_tags = "All tags"
-about = "About"
-search = "Search"
-search_placeholder = "Search…"
-nothing_found = "Nothing found."
-theme_switch = "Switch between light and dark"
-menu = "Menu"
-latest_posts = "Latest posts"
-more = "More"
-newer = "Newer"
-older = "Older"
-last_edited = "Last edited"
-copy = "Copy"
-copied = "Copied"
-copy_code = "Copy code"
+# hrabal writes its words in the site's language, and any of them can be changed here:
+# [translations.cs]
+# newer = "Mladší"

@@ -20,7 +20,7 @@ menu = [
 home_posts = "blog/_index.md" # the section whose newest posts the home page lists
 icon = "icon.svg" # shown before the title and as the favicon, "" for none
 copyright_since = 2024 # the first year in the footer, the last one is always this year
-breadcrumbs = true # Úvod › Blog over the heading of a post
+breadcrumbs = false # true shows Úvod › Blog over the heading of a post
 
 # hrabal writes its words in the site's language, and any of them can be changed here:
 # [translations.cs]

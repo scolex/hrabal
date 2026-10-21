@@ -434,6 +434,19 @@ hr {
   text-decoration: underline;
 }
 
+/* the date of a post, close under its title and to the text that follows */
+article > h1:has(+ time) {
+  margin-bottom: 0.25em;
+}
+
+article > h1 + time {
+  display: block;
+}
+
+article > h1 + time + * {
+  margin-top: 0.75em;
+}
+
 .updated {
   margin-top: 2em;
   color: var(--muted);

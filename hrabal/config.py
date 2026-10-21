@@ -31,6 +31,12 @@ class ThemeConfig:
 
 
 @dataclass
+class LinkCheckerConfig:
+    # for hrabal check, the [link_checker] table like in Zola
+    skip_prefixes: list[str] = field(default_factory=list)  # links starting with one of these aren't checked
+
+
+@dataclass
 class Config:
     base_url: str
     title: str = ""
@@ -48,6 +54,7 @@ class Config:
     feed_limit: int = 0  # 0 puts every page with a date in the feed
     build_search_index: bool = False
     theme: ThemeConfig = field(default_factory=ThemeConfig)
+    link_checker: LinkCheckerConfig = field(default_factory=LinkCheckerConfig)
     translations: dict[str, dict] = field(default_factory=dict)  # [translations.cs] and so on, see i18n.py
     extra: dict = field(default_factory=dict)
 
@@ -70,6 +77,7 @@ def load_config(file: Path) -> Config:
 
     data["taxonomies"] = [load_taxonomy(file, entry) for entry in data.get("taxonomies", [])]
     data["theme"] = load_theme(file, data.get("theme", {}))
+    data["link_checker"] = load_link_checker(file, data.get("link_checker", {}))
     config = Config(**data)
     if not all(isinstance(strings, dict) for strings in config.translations.values()):
         raise HrabalError(f"{file}: translations go in a table per language, like [translations.cs]")
@@ -97,6 +105,18 @@ def load_theme(file: Path, table) -> ThemeConfig:
     if not isinstance(table.get("breadcrumbs", False), bool):
         raise HrabalError(f"{file}: breadcrumbs is either true or false")
     return ThemeConfig(**(table | {"menu": menu}))
+
+
+def load_link_checker(file: Path, table) -> LinkCheckerConfig:
+    if not isinstance(table, dict):
+        raise HrabalError(f"{file}: link checker settings go in a [link_checker] table")
+    unknown = table.keys() - {f.name for f in fields(LinkCheckerConfig)}
+    if unknown:
+        raise HrabalError(f"{file}: unknown link checker settings {', '.join(sorted(unknown))}")
+    skip = table.get("skip_prefixes", [])
+    if not isinstance(skip, list) or not all(isinstance(prefix, str) for prefix in skip):
+        raise HrabalError(f'{file}: skip_prefixes is a list of addresses, like ["https://example.com/"]')
+    return LinkCheckerConfig(skip)
 
 
 def load_taxonomy(file: Path, entry: str | dict) -> TaxonomyConfig:

@@ -180,6 +180,24 @@ Files that live in a page folder work the same way, in links and images:
 `![photo](@/blog/with-pictures/photo.jpg)`.
 Links get checked during the build, so a broken one stops it.
 
+Links to other sites get checked only when you ask, since that takes the network and a while, and
+someone else's server being down shouldn't stop you from publishing:
+
+```sh
+hrabal check
+```
+
+It loads the site like a build would, without writing anything, and tries every `http://` and
+`https://` link and image in the content once, eight at a time. A link that's broken gets listed with
+the file it's in and what went wrong, like `404 Not Found` or `timed out`, and the command fails, so
+it fits into CI. Redirects are followed, and a server that doesn't answer `HEAD` gets a `GET`.
+Links to skip go in `config.toml`, like in Zola:
+
+```toml
+[link_checker]
+skip_prefixes = ["https://twitter.com/", "http://localhost"]
+```
+
 ## Diagrams
 
 Code blocks marked `mermaid` become [Mermaid](https://mermaid.js.org/) diagrams:

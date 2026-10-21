@@ -53,6 +53,7 @@ TOML between `+++` lines, like in Zola:
 +++
 title = "Příliš hlučná samota"
 date = 2024-05-01
+updated = 2024-08-02       # last edited, see below
 description = "Shown in the meta tag"
 slug = "custom-url"        # default is the file name
 draft = true               # left out unless you pass --drafts
@@ -75,6 +76,12 @@ A draft section takes everything inside it along, subsections included.
 `page_template` applies to the subsections too, unless one of them sets its own.
 
 Unknown keys are an error. That's on purpose, so typos don't go unnoticed.
+
+`updated` says when a page was last edited. Without it, hrabal takes the date the file was last
+modified. Keep in mind that a fresh clone, in CI for example, gives every file the time of the clone,
+so for a site built that way, `updated` in the front matter is what keeps the dates honest.
+The sitemap's `lastmod` and Atom's `<updated>` use the later of `date` and `updated`, which templates
+get as `page.last_changed()`. The starter prints "Last edited" under a post that changed after its date.
 
 Put `<!-- more -->` in a page to mark where its summary ends.
 

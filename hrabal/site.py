@@ -23,7 +23,7 @@ from hrabal.content import (
     sort_pages,
     split_date,
 )
-from hrabal.dates import format_date, rfc822, rfc3339
+from hrabal.dates import as_moment, format_date, rfc822, rfc3339
 from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 from hrabal.pagination import Paginator, pager_url, paginate
 from hrabal.search import search_index
@@ -138,8 +138,12 @@ class Site:
         meta, body = read_markdown(file, PAGE_KEYS)
         if meta.pop("draft", False) and not self.drafts:
             return
-        if isinstance(meta.get("date"), str):
-            raise HrabalError(f"{file}: write the date without quotes, like date = 2024-05-01")
+        for key in ("date", "updated"):
+            if isinstance(meta.get(key), str):
+                raise HrabalError(f"{file}: write the {key} without quotes, like {key} = 2024-05-01")
+        if "updated" not in meta:
+            # careful: a git clone or a copy gives every file a fresh modification time
+            meta["updated"] = datetime.date.fromtimestamp(file.stat().st_mtime)
 
         # a page with its own folder (blog/post/index.md) is called a bundle and can carry files along
         is_bundle = file.name == "index.md"
@@ -302,7 +306,7 @@ class Site:
             self.write_file("/search_index.json", search_index(list(self.pages.values())))
 
     def write_sitemap(self):
-        dates = {page.path: page.date for page in self.pages.values()}
+        dates = {page.path: page.last_changed() for page in self.pages.values()}
         entries = [SitemapEntry(self.permalink(path), dates.get(path)) for path in sorted(self.rendered)]
         self.write_file("/sitemap.xml", self.render_template("sitemap.xml", "/sitemap.xml", entries=entries))
 
@@ -335,7 +339,7 @@ class Site:
                 title=title,
                 link=link,
                 feed_url=self.permalink(path + name),
-                last_updated=pages[0].date if pages else None,
+                last_updated=max(filter(None, (page.last_changed() for page in pages)), key=as_moment, default=None),
                 **context,
             )
             self.write_file(path + name, xml)

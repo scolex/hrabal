@@ -386,3 +386,9 @@ hr {
 .footnotes-sep {
   margin-bottom: 1em;
 }
+
+.updated {
+  margin-top: 2em;
+  color: var(--muted);
+  font-size: 0.9em;
+}

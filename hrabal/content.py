@@ -6,8 +6,21 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from hrabal import HrabalError
+from hrabal.dates import as_moment
 
-PAGE_KEYS = {"title", "description", "date", "slug", "weight", "draft", "template", "search", "taxonomies", "extra"}
+PAGE_KEYS = {
+    "title",
+    "description",
+    "date",
+    "updated",
+    "slug",
+    "weight",
+    "draft",
+    "template",
+    "search",
+    "taxonomies",
+    "extra",
+}
 SECTION_KEYS = {
     "title",
     "description",
@@ -35,6 +48,7 @@ class Page:
     title: str = ""
     description: str = ""
     date: datetime.date | None = None
+    updated: datetime.date | None = None  # the last edit: from the front matter, or else the file's modification date
     weight: int = 0
     template: str = "page.html"
     search: bool = True  # false keeps the page out of search_index.json
@@ -48,6 +62,11 @@ class Page:
     assets: list[Path] = field(default_factory=list)
     previous: Page | None = field(default=None, repr=False)
     next: Page | None = field(default=None, repr=False)
+
+    def last_changed(self) -> datetime.date | None:
+        # the later of date and updated, what sitemaps and feeds call the last update
+        moments = [moment for moment in (self.date, self.updated) if moment]
+        return max(moments, key=as_moment) if moments else None
 
 
 @dataclass(eq=False)

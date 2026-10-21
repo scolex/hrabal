@@ -44,7 +44,7 @@ def test_atom_feed_describes_itself(public):
 
     assert root.findtext("a:title", "", ATOM) == "Hrabal test site"
     assert root.findtext("a:id", "", ATOM) == "https://example.com/atom.xml"
-    assert root.findtext("a:updated", "", ATOM) == "2017-04-01T00:00:00+00:00"
+    assert root.findtext("a:updated", "", ATOM) == "2018-01-15T00:00:00+00:00"  # python.md's edit, the latest
     assert root.findtext("a:author/a:name", "", ATOM) == "Test Author"
     self_link = root.find("a:link[@rel='self']", ATOM)
     assert self_link is not None
@@ -57,6 +57,7 @@ def test_atom_entries_carry_their_content(public):
 
     assert python.findtext("a:id", "", ATOM) == "https://example.com/posts/python/"
     assert python.findtext("a:published", "", ATOM) == "2017-03-01T00:00:00+00:00"
+    assert python.findtext("a:updated", "", ATOM) == "2018-01-15T00:00:00+00:00"
     assert python.findtext("a:summary", "", ATOM).strip() == "<p>Summary first.</p>"
     assert "print" in python.findtext("a:content", "", ATOM)  # escaped once, so it parses back to HTML
 

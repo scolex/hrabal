@@ -2,6 +2,7 @@
 title = "Python"
 description = "Snakes"
 date = 2017-03-01
+updated = 2018-01-15
 
 [taxonomies]
 categories = ["A category"]

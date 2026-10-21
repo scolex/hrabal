@@ -42,12 +42,12 @@ def test_pagers_and_taxonomies_are_in_the_sitemap(public):
     assert "https://example.com/categories/a-category/page/2/" in urls
 
 
-def test_dated_pages_have_lastmod(public):
+def test_pages_have_lastmod(public):
     urls = read_sitemap(public)
 
-    assert urls["https://example.com/posts/python/"] == "2017-03-01"
+    assert urls["https://example.com/posts/python/"] == "2018-01-15"  # edited after it came out
     assert urls["https://example.com/posts/a-post-with-dates/"] == "2016-10-08"
-    assert urls["https://example.com/hello/"] is None
+    assert urls["https://example.com/hello/"] == "2000-01-01"  # no date, so the file's, see conftest.py
 
 
 def test_drafts_are_in_the_sitemap_only_when_built(public, site_dir, tmp_path):

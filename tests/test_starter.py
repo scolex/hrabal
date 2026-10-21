@@ -1,4 +1,5 @@
 import datetime
+import os
 import shutil
 from pathlib import Path
 
@@ -187,6 +188,29 @@ def test_starter_has_an_icon_for_every_alert(starter_dir):
     for kind in ("note", "tip", "important", "warning", "caution"):
         assert (public / "alerts" / f"{kind}.svg").exists()
         assert f'url("alerts/{kind}.svg")' in css
+
+
+def test_starter_says_when_a_post_was_last_edited(starter_dir):
+    post = starter_dir / "content" / "blog" / "prilis-hlucna-samota.md"
+    edited = datetime.datetime(2025, 3, 9, 12, 0).timestamp()
+    os.utime(post, (edited, edited))
+    Site(starter_dir).build()
+    blog = starter_dir / "public" / "blog"
+
+    tour = (blog / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    assert '<p class="updated">Last edited <time>2. srpna 2024</time></p>' in tour  # from its front matter
+    samota = (blog / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    assert "Last edited <time>9. března 2025</time>" in samota  # from the file
+
+
+def test_no_edit_date_when_nothing_changed_after_publishing(starter_dir):
+    post = starter_dir / "content" / "blog" / "prilis-hlucna-samota.md"
+    published = datetime.datetime(2024, 5, 1, 12, 0).timestamp()  # the post's own date
+    os.utime(post, (published, published))
+    Site(starter_dir).build()
+
+    samota = (starter_dir / "public" / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    assert "Last edited" not in samota
 
 
 def test_starter_blog_is_paginated(starter_dir):

@@ -1,6 +1,7 @@
 +++
 title = "A tour of hrabal"
 description = "Everything a post can hold, on one long page"
+updated = 2024-08-02 # shown at the bottom, without it hrabal would take the file's modification date
 
 [taxonomies]
 tags = ["hrabal", "markdown"]

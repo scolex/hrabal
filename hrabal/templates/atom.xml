@@ -21,7 +21,7 @@
     <link rel="alternate" type="text/html" href="{{ page.permalink }}"/>
     <id>{{ page.permalink }}</id>
     <published>{{ page.date | rfc3339 }}</published>
-    <updated>{{ page.date | rfc3339 }}</updated>
+    <updated>{{ page.last_changed() | rfc3339 }}</updated>
 {% if page.summary %}
     <summary type="html">{{ page.summary }}</summary>
 {% endif %}

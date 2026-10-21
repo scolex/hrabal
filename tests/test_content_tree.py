@@ -2,6 +2,7 @@
 # Tests that break the site on purpose add their files to a copy of it, see site_dir in conftest.py.
 
 import datetime
+import os
 import re
 from pathlib import Path
 
@@ -332,3 +333,37 @@ def test_summary_has_no_footnote_numbers(site_dir):
 
     assert page.summary.strip() == "<p>Short summary.</p>"
     assert "footnote-ref" in page.content  # the page itself keeps it
+
+
+# when a page was last edited
+
+
+def test_updated_comes_from_the_front_matter(site_dir):
+    python = load(site_dir).pages["posts/python.md"]
+
+    assert python.updated == datetime.date(2018, 1, 15)
+    assert python.last_changed() == datetime.date(2018, 1, 15)
+
+
+def test_last_changed_is_the_later_of_date_and_updated(site_dir):
+    site = load(site_dir)
+
+    # conftest.py gives every file of the test site 2000-01-01, older than any date in it
+    assert site.pages["posts/simple.md"].last_changed() == datetime.date(2017, 4, 1)
+    assert site.pages["hello.md"].last_changed() == datetime.date(2000, 1, 1)  # no date, only the file's
+
+
+def test_updated_falls_back_to_the_file_time(site_dir):
+    hello = site_dir / "content" / "hello.md"
+    moment = datetime.datetime(2023, 6, 7, 12, 0).timestamp()
+    os.utime(hello, (moment, moment))
+
+    site = load(site_dir)
+    assert site.pages["hello.md"].updated == datetime.date(2023, 6, 7)
+    assert site.pages["posts/python.md"].updated == datetime.date(2018, 1, 15)  # the front matter still wins
+
+
+def test_quoted_updated_is_an_error(site_dir):
+    write_files(site_dir, {"content/quoted.md": '+++\nupdated = "2024-05-01"\n+++\n'})
+    with pytest.raises(HrabalError, match="write the updated without quotes"):
+        load(site_dir)

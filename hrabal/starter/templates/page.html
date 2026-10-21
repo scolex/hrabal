@@ -17,6 +17,11 @@
     {% endfor %}
   </p>
   {% endif %}
+
+  {# only when it changed after it came out, the same day would say nothing new #}
+  {% if page.updated and (not page.date or page.updated | date("%Y-%m-%d") > page.date | date("%Y-%m-%d")) %}
+  <p class="updated">Last edited <time>{{ page.updated | date("%-d. %B %Y") }}</time></p>
+  {% endif %}
 </article>
 
 {% if page.previous or page.next %}

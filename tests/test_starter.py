@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 import shutil
 from pathlib import Path
 
@@ -88,7 +89,8 @@ def test_starter_icon_shows_next_to_the_title_and_as_favicon(starter_dir):
 
 def test_starter_icon_can_be_left_out(starter_dir):
     config = starter_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").split("[extra]")[0], encoding="utf-8")
+    text = config.read_text(encoding="utf-8")
+    config.write_text(re.sub(r"^icon = .*\n", "", text, flags=re.MULTILINE), encoding="utf-8")
     Site(starter_dir).build()
 
     index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
@@ -153,7 +155,7 @@ def test_starter_adds_copy_buttons_to_code(starter_dir):
     public = starter_dir / "public"
 
     post = (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
-    assert '<script defer src="https://example.com/copy.js">' in post
+    assert '<script defer src="https://example.com/copy.js" data-copy="Kopírovat" data-copied="Zkopírováno"' in post
     for name in ("copy.js", "copy.svg", "check.svg"):
         assert (public / name).exists()
 
@@ -198,9 +200,9 @@ def test_starter_says_when_a_post_was_last_edited(starter_dir):
     blog = starter_dir / "public" / "blog"
 
     tour = (blog / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
-    assert '<p class="updated">Last edited <time>2. srpna 2024</time></p>' in tour  # from its front matter
+    assert '<p class="updated">Naposledy upraveno <time>2. srpna 2024</time></p>' in tour  # from its front matter
     samota = (blog / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
-    assert "Last edited <time>9. března 2025</time>" in samota  # from the file
+    assert "Naposledy upraveno <time>9. března 2025</time>" in samota  # from the file
 
 
 def test_no_edit_date_when_nothing_changed_after_publishing(starter_dir):
@@ -210,7 +212,7 @@ def test_no_edit_date_when_nothing_changed_after_publishing(starter_dir):
     Site(starter_dir).build()
 
     samota = (starter_dir / "public" / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
-    assert "Last edited" not in samota
+    assert "Naposledy upraveno" not in samota
 
 
 def test_starter_blog_is_paginated(starter_dir):
@@ -219,7 +221,7 @@ def test_starter_blog_is_paginated(starter_dir):
 
     listing = (blog / "index.html").read_text(encoding="utf-8")
     assert "Příliš hlučná samota" in listing
-    assert "Older" not in listing  # just one pager, so nowhere to go
+    assert "Starší" not in listing  # just one pager, so nowhere to go
     assert (blog / "page" / "1" / "index.html").exists()
 
 
@@ -268,3 +270,33 @@ def test_starter_summary(starter_dir):
 
     assert "summary shown in post lists" in post.summary
     assert "Pygments" not in post.summary
+
+
+def test_starter_speaks_czech(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+    index = (public / "index.html").read_text(encoding="utf-8")
+
+    assert '<html lang="cs">' in index
+    assert ">Štítky</a>" in index
+    assert "<h2>Nejnovější příspěvky</h2>" in index
+    assert 'placeholder="Hledat…"' in index
+    assert "<time>20. července 2024</time>" in index  # date_long from hrabal's own Czech
+    assert "<h1>Štítky</h1>" in (public / "tags" / "index.html").read_text(encoding="utf-8")
+
+
+def test_starter_switches_to_english_with_one_line(starter_dir):
+    config = starter_dir / "config.toml"
+    config.write_text(
+        config.read_text(encoding="utf-8").replace('language = "cs"', 'language = "en"'), encoding="utf-8"
+    )
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+    index = (public / "index.html").read_text(encoding="utf-8")
+
+    assert '<html lang="en">' in index
+    assert ">Tags</a>" in index
+    assert "<h2>Latest posts</h2>" in index
+    assert "<time>July 20, 2024</time>" in index
+    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    assert '<p class="markdown-alert-title">Note</p>' in tour

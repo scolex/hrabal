@@ -4,6 +4,7 @@ import pytest
 
 from hrabal import HrabalError
 from hrabal.dates import format_date, rfc822, rfc3339
+from hrabal.i18n import Translations
 
 # a Wednesday
 DAY = datetime.date(2017, 3, 1)
@@ -24,16 +25,16 @@ DAY = datetime.date(2017, 3, 1)
     ],
 )
 def test_format_date(format, locale, expected):
-    assert format_date(DAY, format, locale) == expected
+    assert format_date(DAY, format, Translations(locale)) == expected
 
 
 @pytest.mark.parametrize("locale", ["cs", "cs_CZ", "cs-CZ", "CS"])
 def test_locale_can_carry_a_country(locale):
-    assert format_date(DAY, "%B", locale) == "března"
+    assert format_date(DAY, "%B", Translations(locale)) == "března"
 
 
 def test_all_czech_months_in_a_date():
-    months = [format_date(datetime.date(2024, month, 1), "%B", "cs") for month in range(1, 13)]
+    months = [format_date(datetime.date(2024, month, 1), "%B", Translations("cs")) for month in range(1, 13)]
     assert months == [
         "ledna", "února", "března", "dubna", "května", "června",
         "července", "srpna", "září", "října", "listopadu", "prosince",
@@ -42,12 +43,21 @@ def test_all_czech_months_in_a_date():
 
 def test_times_work_too():
     moment = datetime.datetime(2024, 5, 1, 9, 5)
-    assert format_date(moment, "%-d. %B %Y, %-H:%M", "cs") == "1. května 2024, 9:05"
+    assert format_date(moment, "%-d. %B %Y, %-H:%M", Translations("cs")) == "1. května 2024, 9:05"
 
 
-def test_unknown_locale_is_an_error():
-    with pytest.raises(HrabalError, match="no month and day names for 'de'"):
-        format_date(DAY, "%B", "de")
+def test_names_for_a_language_hrabal_does_not_know_are_asked_for():
+    with pytest.raises(HrabalError, match=r"no translation for 'months' in 'de', add it under \[translations.de\]"):
+        format_date(DAY, "%B", Translations("de"))
+
+
+def test_numbers_only_need_no_translations():
+    assert format_date(DAY, "%Y-%m-%d", Translations("de")) == "2017-03-01"
+
+
+def test_site_can_bring_names_of_its_own():
+    german = Translations("de", {"de": {"months": ["Januar", "Februar", "März"] + [""] * 9}})
+    assert format_date(DAY, "%-d. %B %Y", german) == "1. März 2017"
 
 
 @pytest.mark.parametrize(

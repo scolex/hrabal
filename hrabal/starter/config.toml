@@ -12,3 +12,42 @@ build_search_index = true
 [extra]
 copyright_since = 2024 # the first year in the footer's copyright line, the last one is always this year
 icon = "icon.svg" # a file in static/, shown next to the title and used as the favicon, leave it out for none
+
+# the starter's own strings, read in templates with trans("key"). hrabal brings month names, date formats
+# (date_long, date_short) and alert titles itself, and any of those can be overridden here as well.
+# Switch language above to "en" and the site follows.
+[translations.cs]
+blog = "Blog"
+tags = "Štítky"
+all_tags = "Všechny štítky"
+about = "O webu"
+search = "Hledat"
+search_placeholder = "Hledat…"
+nothing_found = "Nic jsme nenašli."
+theme_switch = "Přepnout světlý a tmavý vzhled"
+latest_posts = "Nejnovější příspěvky"
+more = "Další"
+newer = "Novější"
+older = "Starší"
+last_edited = "Naposledy upraveno"
+copy = "Kopírovat"
+copied = "Zkopírováno"
+copy_code = "Kopírovat kód"
+
+[translations.en]
+blog = "Blog"
+tags = "Tags"
+all_tags = "All tags"
+about = "About"
+search = "Search"
+search_placeholder = "Search…"
+nothing_found = "Nothing found."
+theme_switch = "Switch between light and dark"
+latest_posts = "Latest posts"
+more = "More"
+newer = "Newer"
+older = "Older"
+last_edited = "Last edited"
+copy = "Copy"
+copied = "Copied"
+copy_code = "Copy code"

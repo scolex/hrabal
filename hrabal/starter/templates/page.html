@@ -6,7 +6,7 @@
 {% block content %}
 <article>
   <h1>{{ page.title }}</h1>
-  {% if page.date %}<time>{{ page.date | date("%-d. %B %Y") }}</time>{% endif %}
+  {% if page.date %}<time>{{ page.date | date(trans("date_long")) }}</time>{% endif %}
 
   {{ page.content | safe }}
 
@@ -20,7 +20,7 @@
 
   {# only when it changed after it came out, the same day would say nothing new #}
   {% if page.updated and (not page.date or page.updated | date("%Y-%m-%d") > page.date | date("%Y-%m-%d")) %}
-  <p class="updated">Last edited <time>{{ page.updated | date("%-d. %B %Y") }}</time></p>
+  <p class="updated">{{ trans("last_edited") }} <time>{{ page.updated | date(trans("date_long")) }}</time></p>
   {% endif %}
 </article>
 

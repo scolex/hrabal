@@ -4,6 +4,6 @@
 {% block content %}
 {{ section.content | safe }}
 
-<h2>Latest posts</h2>
+<h2>{{ trans("latest_posts") }}</h2>
 {{ post_list(get_section("blog/_index.md").pages[:5]) }}
 {% endblock %}

@@ -101,7 +101,7 @@ def test_date_filter_with_an_unknown_locale_stops_the_build(site_dir):
     config = site_dir / "config.toml"
     config.write_text('language = "tlh"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
 
-    with pytest.raises(HrabalError, match="no month and day names for 'tlh'"):
+    with pytest.raises(HrabalError, match="no translation for 'months' in 'tlh'"):
         Site(site_dir).build()
 
 

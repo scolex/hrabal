@@ -1,5 +1,7 @@
 import pytest
 
+from hrabal import HrabalError
+from hrabal.i18n import Translations
 from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 
 DIAGRAM = "```mermaid\nflowchart LR\n    a[A & B] --> b\n```\n"
@@ -54,10 +56,20 @@ def test_alert_marker_ignores_case():
     assert "markdown-alert-warning" in render("> [!warning]\n> Text.\n")
 
 
-@pytest.mark.parametrize("language, title", [("cs", "Varování"), ("cs_CZ", "Varování"), ("de", "Warning")])
+@pytest.mark.parametrize("language, title", [("en", "Warning"), ("cs", "Varování"), ("cs_CZ", "Varování")])
 def test_alert_titles_follow_the_language(language, title):
-    html = Markdown(None, language).render("> [!WARNING]\n> Text.\n", resolve_link=lambda link: link)
-    assert f'<p class="markdown-alert-title">{title}</p>' in html  # unknown languages stay English
+    html = Markdown(None, Translations(language)).render("> [!WARNING]\n> Text.\n", resolve_link=lambda link: link)
+    assert f'<p class="markdown-alert-title">{title}</p>' in html
+
+
+def test_alert_in_a_language_without_titles_asks_for_them():
+    with pytest.raises(HrabalError, match="no translation for 'alert_warning' in 'de'"):
+        Markdown(None, Translations("de")).render("> [!WARNING]\n> Text.\n", resolve_link=lambda link: link)
+
+
+def test_alert_with_its_own_title_needs_no_translation():
+    html = Markdown(None, Translations("de")).render("> [!WARNING] Achtung\n> Text.\n", resolve_link=lambda link: link)
+    assert '<p class="markdown-alert-title">Achtung</p>' in html
 
 
 def test_alert_can_have_its_own_title():

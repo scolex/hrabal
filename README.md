@@ -125,7 +125,7 @@ Note, tip and warning boxes are written the way GitHub does it, as a blockquote 
 ```
 
 The markers are `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` and `[!CAUTION]`. Without a title of
-its own an alert gets one in the site's `language`, English or Czech ("Poznámka", "Varování", …).
+its own an alert gets one in the site's `language`, `alert_note`, `alert_warning` and so on from the translations.
 The HTML is GitHub's too, `<div class="markdown-alert markdown-alert-warning">` with a
 `<p class="markdown-alert-title">`, so CSS made for GitHub alerts works. The starter has its own.
 
@@ -264,11 +264,13 @@ Everywhere you also get `config` and these functions:
 - `get_section("blog/_index.md")`
 - `get_taxonomy_url("tags", "books")`
 - `now()`, the time of the build, so `{{ now().year }}` keeps a copyright line current
+- `trans("newer")`, a string in the site's language, see [Languages](#languages)
 
 and a `date` filter, with the usual `strftime` codes: `{{ page.date | date("%d. %m. %Y") }}`.
 
-Month and day names follow `language` in `config.toml`, English and Czech are built in.
-A template can ask for another one with `locale`:
+Month and day names follow `language` in `config.toml`, and so do two ready-made formats,
+`{{ page.date | date(trans("date_long")) }}` and `date_short`. A template can ask for another
+language with `locale`:
 
 ```jinja
 {{ page.date | date("%-d. %B %Y", locale="cs") }}   {# 1. května 2024 #}
@@ -278,11 +280,40 @@ A template can ask for another one with `locale`:
 
 `%B` is the month as it's used inside a date ("1. května"), `%OB` the plain one ("květen").
 A minus, like in `%-d`, drops the leading zero. `cs_CZ` works as well as `cs`.
+Formats with numbers only, like `%Y-%m-%d`, work in any language.
 
 Pages have `title`, `description`, `content`, `summary`, `date`, `permalink`, `path`, `slug`,
 `taxonomies`, `assets`, `extra`, `previous` and `next` (neighbours in the section's order).
 Sections have `title`, `description`, `content`, `pages`, `subsections`, `permalink`, `path` and `extra`.
 `draft` only decides whether something gets built, templates don't see it.
+
+## Languages
+
+A site has one language, `language` in `config.toml`, and everything hrabal writes in words follows it:
+month and day names, the date formats `date_long` and `date_short`, alert titles and the label of
+heading links. hrabal brings those in English and Czech, in `hrabal/translations/`.
+
+A site adds strings of its own, or overrides hrabal's, in a table per language:
+
+```toml
+language = "cs"
+
+[translations.cs]
+newer = "Novější"
+alert_tip = "Rada"          # instead of hrabal's own "Tip"
+date_long = "%-d. %B %Y"
+
+[translations.en]
+newer = "Newer"
+```
+
+Templates read them with `trans("newer")`, or `trans("newer", lang="en")` for another language.
+A string that's missing stops the build and says which table to add it to, so a typo in a template
+can't slip through. That's also how to write a site in a language hrabal doesn't know yet: give
+`[translations.de]` the `months`, `days` and the other keys from `hrabal/translations/en.toml`.
+
+The starter keeps all its interface strings there, in Czech and English, so switching `language`
+switches the whole site. Its scripts get theirs through `data-` attributes in `base.html`.
 
 ## Development
 

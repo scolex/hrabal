@@ -2,6 +2,8 @@
 # "Quotes and alerts" becomes #quotes-and-alerts, and a second heading with the same text gets -1, -2, ...
 # With insert_anchor_links, a link to the heading goes to its left, its right, or around the whole heading.
 
+from html import escape
+
 from markdown_it.rules_core import StateCore
 from markdown_it.token import Token
 
@@ -14,6 +16,7 @@ def heading_ids(state: StateCore):
     # runs after inline parsing, so the heading's text is there without the markdown around it
     mode = state.env.get("anchor_links", "none")
     taken = state.env.setdefault("heading_ids", [])
+    label = state.env["translations"]["anchor_label"] if mode in ("left", "right") else ""
 
     for i, token in enumerate(state.tokens):
         if token.type != "heading_open":
@@ -21,7 +24,7 @@ def heading_ids(state: StateCore):
         inline = state.tokens[i + 1]
         anchor = unique(slugify(plain_text(inline)) or "heading", taken)
         token.attrSet("id", anchor)
-        add_anchor_link(inline, anchor, mode)
+        add_anchor_link(inline, anchor, mode, label)
 
 
 def plain_text(inline: Token) -> str:
@@ -37,7 +40,7 @@ def unique(anchor: str, taken: list[str]) -> str:
     return candidate
 
 
-def add_anchor_link(inline: Token, anchor: str, mode: str):
+def add_anchor_link(inline: Token, anchor: str, mode: str, label: str):
     if mode == "none":
         return
 
@@ -51,5 +54,5 @@ def add_anchor_link(inline: Token, anchor: str, mode: str):
         inline.children = [html(f'<a class="anchor" href="#{anchor}">'), *children, html("</a>")]
         return
 
-    link = html(f'<a class="anchor" href="#{anchor}" aria-label="Link to this heading">#</a>')
+    link = html(f'<a class="anchor" href="#{anchor}" aria-label="{escape(label)}">#</a>')
     inline.children = [link, html(" "), *children] if mode == "left" else [*children, html(" "), link]

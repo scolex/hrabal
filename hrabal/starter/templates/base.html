@@ -11,7 +11,8 @@
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
   <script src="{{ get_url('theme.js') }}"></script>
-  <script defer src="{{ get_url('copy.js') }}"></script>
+  <script defer src="{{ get_url('copy.js') }}" data-copy="{{ trans('copy') }}" data-copied="{{ trans('copied') }}"
+          data-label="{{ trans('copy_code') }}"></script>
   {% if config.generate_feeds %}
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url('atom.xml') }}">
   {% endif %}
@@ -29,14 +30,14 @@
       {{ config.title }}
     </a>
     <nav>
-      <a href="{{ get_url('@/blog/_index.md') }}">Blog</a>
-      <a href="{{ get_url('/tags/') }}">Tags</a>
-      <a href="{{ get_url('@/about.md') }}">About</a>
+      <a href="{{ get_url('@/blog/_index.md') }}">{{ trans("blog") }}</a>
+      <a href="{{ get_url('/tags/') }}">{{ trans("tags") }}</a>
+      <a href="{{ get_url('@/about.md') }}">{{ trans("about") }}</a>
       {% if config.build_search_index %}
       {# a plain link to the search page, search.js turns it into the overlay below #}
-      <a class="search-open" href="{{ get_url('@/search.md') }}" title="Search (/)" aria-label="Search"></a>
+      <a class="search-open" href="{{ get_url('@/search.md') }}" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></a>
       {% endif %}
-      <button class="theme-switch" type="button" title="Switch between light and dark">◐</button>
+      <button class="theme-switch" type="button" title="{{ trans('theme_switch') }}">◐</button>
     </nav>
   </header>
 
@@ -52,8 +53,8 @@
 
   {% if config.build_search_index %}
   <dialog class="search-dialog">
-    <div class="search" data-index="{{ get_url('search_index.json') }}" data-empty="Nothing found.">
-      <input type="search" placeholder="Search…" aria-label="Search">
+    <div class="search" data-index="{{ get_url('search_index.json') }}" data-empty="{{ trans('nothing_found') }}">
+      <input type="search" placeholder="{{ trans('search_placeholder') }}" aria-label="{{ trans('search') }}">
       <ol class="search-results"></ol>
     </div>
   </dialog>

@@ -31,6 +31,7 @@ class Config:
     feed_filenames: list[str] = field(default_factory=lambda: ["atom.xml"])
     feed_limit: int = 0  # 0 puts every page with a date in the feed
     build_search_index: bool = False
+    translations: dict[str, dict] = field(default_factory=dict)  # [translations.cs] and so on, see i18n.py
     extra: dict = field(default_factory=dict)
 
 
@@ -52,6 +53,8 @@ def load_config(file: Path) -> Config:
 
     data["taxonomies"] = [load_taxonomy(file, entry) for entry in data.get("taxonomies", [])]
     config = Config(**data)
+    if not all(isinstance(strings, dict) for strings in config.translations.values()):
+        raise HrabalError(f"{file}: translations go in a table per language, like [translations.cs]")
     if config.insert_anchor_links not in ANCHOR_LINKS:
         raise HrabalError(f"{file}: insert_anchor_links must be one of {', '.join(ANCHOR_LINKS)}")
     if not isinstance(config.feed_limit, int) or config.feed_limit < 0:

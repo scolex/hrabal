@@ -1,0 +1,21 @@
+# hrabal's own Czech strings. A site can override any of them, or add its own,
+# under [translations.cs] in its config.toml, and templates read them with trans("key").
+
+# dates, for the date filter: %B is the month inside a date ("1. května"), %OB the month on its own ("květen")
+months = ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince"]
+standalone_months = ["leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec"]
+short_months = ["led", "úno", "bře", "dub", "kvě", "čvn", "čvc", "srp", "zář", "říj", "lis", "pro"]
+days = ["pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota", "neděle"]
+short_days = ["po", "út", "st", "čt", "pá", "so", "ne"]
+date_long = "%-d. %B %Y"
+date_short = "%-d. %-m. %Y"
+
+# titles of > [!NOTE] and friends, unless the alert brings its own
+alert_note = "Poznámka"
+alert_tip = "Tip"
+alert_important = "Důležité"
+alert_warning = "Varování"
+alert_caution = "Pozor"
+
+# what screen readers say for the link next to a heading, with insert_anchor_links
+anchor_label = "Odkaz na tento nadpis"

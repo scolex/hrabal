@@ -11,16 +11,16 @@
 {% if paginator %}
 {{ post_list(paginator.pages) }}
 <nav class="pagination">
-  {% if paginator.previous %}<a class="button" href="{{ paginator.previous }}">← Newer</a>{% endif %}
+  {% if paginator.previous %}<a class="button" href="{{ paginator.previous }}">← {{ trans("newer") }}</a>{% endif %}
   {% if paginator.number_pagers > 1 %}<span>{{ paginator.current_index }} / {{ paginator.number_pagers }}</span>{% endif %}
-  {% if paginator.next %}<a class="button" href="{{ paginator.next }}">Older →</a>{% endif %}
+  {% if paginator.next %}<a class="button" href="{{ paginator.next }}">{{ trans("older") }} →</a>{% endif %}
 </nav>
 {% else %}
 {{ post_list(section.pages) }}
 {% endif %}
 
 {% if section.subsections %}
-<h2>More</h2>
+<h2>{{ trans("more") }}</h2>
 <ul>
   {% for sub in section.subsections %}
   <li><a href="{{ sub.permalink }}">{{ sub.title }}</a></li>

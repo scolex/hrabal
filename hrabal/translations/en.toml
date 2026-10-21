@@ -1,0 +1,21 @@
+# hrabal's own English strings. A site can override any of them, or add its own,
+# under [translations.en] in its config.toml, and templates read them with trans("key").
+
+# dates, for the date filter: %B, %OB, %b, %A and %a
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+standalone_months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+short_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+short_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+date_long = "%B %-d, %Y"
+date_short = "%b %-d, %Y"
+
+# titles of > [!NOTE] and friends, unless the alert brings its own
+alert_note = "Note"
+alert_tip = "Tip"
+alert_important = "Important"
+alert_warning = "Warning"
+alert_caution = "Caution"
+
+# what screen readers say for the link next to a heading, with insert_anchor_links
+anchor_label = "Link to this heading"

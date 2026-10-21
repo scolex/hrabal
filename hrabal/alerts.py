@@ -12,28 +12,20 @@ from html import escape
 from markdown_it.rules_core import StateCore
 from markdown_it.token import Token
 
+from hrabal.i18n import Translations
+
 MARKER = re.compile(r"\[!(note|tip|important|warning|caution)\][ \t]*(.*)", re.IGNORECASE)
 
-TITLES = {
-    "en": {"note": "Note", "tip": "Tip", "important": "Important", "warning": "Warning", "caution": "Caution"},
-    "cs": {"note": "Poznámka", "tip": "Tip", "important": "Důležité", "warning": "Varování", "caution": "Pozor"},
-}
 
-
-def alert_rule(language: str):
-    # titles for languages hrabal doesn't know yet stay English, an alert shouldn't stop a build
-    titles = TITLES.get(language.replace("-", "_").split("_")[0].lower(), TITLES["en"])
-
-    def github_alerts(state: StateCore):
-        # runs between parsing blocks and inlines, so the marker is still plain text at the start of the paragraph
-        tokens = state.tokens
-        i = 0
-        while i < len(tokens):
-            if is_alert(tokens, i):
-                turn_into_alert(tokens, i, titles)
-            i += 1
-
-    return github_alerts
+def github_alerts(state: StateCore):
+    # runs between parsing blocks and inlines, so the marker is still plain text at the start of the paragraph;
+    # titles come from the translations: alert_note, alert_tip and so on
+    tokens = state.tokens
+    i = 0
+    while i < len(tokens):
+        if is_alert(tokens, i):
+            turn_into_alert(tokens, i, state.env["translations"])
+        i += 1
 
 
 def is_alert(tokens: list[Token], i: int) -> bool:
@@ -46,13 +38,13 @@ def is_alert(tokens: list[Token], i: int) -> bool:
     )
 
 
-def turn_into_alert(tokens: list[Token], i: int, titles: dict[str, str]):
+def turn_into_alert(tokens: list[Token], i: int, translations: Translations):
     opening, paragraph, inline = tokens[i], tokens[i + 1], tokens[i + 2]
     first_line, _, rest = inline.content.partition("\n")
     match = MARKER.fullmatch(first_line.strip())
     assert match
     kind = match[1].lower()
-    title = match[2].strip() or titles[kind]
+    title = match[2].strip() or translations[f"alert_{kind}"]
 
     opening.tag = "div"
     opening.attrSet("class", f"markdown-alert markdown-alert-{kind}")

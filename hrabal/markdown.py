@@ -12,15 +12,16 @@ from pygments.token import Text
 from pygments.util import ClassNotFound
 
 from hrabal import HrabalError
-from hrabal.alerts import alert_rule
+from hrabal.alerts import github_alerts
 from hrabal.anchors import heading_ids
+from hrabal.i18n import ENGLISH, Translations
 
 MERMAID = '<pre class="mermaid">'
 FOOTNOTE_REF = re.compile(r"\[\^[^\]\s]+\](?!:)")  # [^1] in the text, but not the [^1]: that defines it
 
 
 class Markdown:
-    def __init__(self, highlight_theme: str | None = None, language: str = "en"):
+    def __init__(self, highlight_theme: str | None = None, translations: Translations = ENGLISH):
         options = {}
         if highlight_theme:
             self.setup_highlighting(highlight_theme)
@@ -31,13 +32,15 @@ class Markdown:
         self.md.add_render_rule("image", render_image)
         self.md.add_render_rule("fence", render_fence)
         self.md.add_render_rule("footnote_caption", render_footnote_caption)
-        self.md.core.ruler.after("block", "github_alerts", alert_rule(language))
+        self.translations = translations
+        self.md.core.ruler.after("block", "github_alerts", github_alerts)
         self.md.core.ruler.after("inline", "heading_ids", heading_ids)
 
     def render(self, text: str, resolve_link, anchor_links="none", heading_ids: list[str] | None = None) -> str:
         # heading_ids, when given, gets the id of every heading, so links to them can be checked
         ids = [] if heading_ids is None else heading_ids
-        return self.md.render(text, {"resolve_link": resolve_link, "anchor_links": anchor_links, "heading_ids": ids})
+        env = {"resolve_link": resolve_link, "anchor_links": anchor_links, "heading_ids": ids}
+        return self.md.render(text, env | {"translations": self.translations})
 
     def setup_highlighting(self, theme: str):
         try:

@@ -7,8 +7,8 @@
 {{ page.content | safe }}
 
 {# the same search as the overlay, but it keeps the query in the url, so a search can be linked to #}
-<div class="search search-page" data-index="{{ get_url('search_index.json') }}" data-empty="Nothing found.">
-  <input type="search" placeholder="Search…" aria-label="Search" autofocus>
+<div class="search search-page" data-index="{{ get_url('search_index.json') }}" data-empty="{{ trans('nothing_found') }}">
+  <input type="search" placeholder="{{ trans('search_placeholder') }}" aria-label="{{ trans('search') }}" autofocus>
   <ol class="search-results"></ol>
 </div>
 {% endblock %}

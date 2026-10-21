@@ -24,6 +24,7 @@ from hrabal.content import (
     split_date,
 )
 from hrabal.dates import as_moment, format_date, rfc822, rfc3339
+from hrabal.i18n import Translations, base_language
 from hrabal.markdown import Markdown, has_mermaid, without_footnote_refs
 from hrabal.pagination import Paginator, pager_url, paginate
 from hrabal.search import search_index
@@ -68,6 +69,7 @@ class Site:
         self.pages: dict[str, Page] = {}
         self.assets: dict[str, str] = {}  # files living next to a bundle's index.md, mapped to their urls
         self.taxonomies: dict[str, Taxonomy] = {}
+        self.loaded_translations: dict[str, Translations] = {}
         # links like @/page.md#heading, checked once every page knows its headings
         self.anchors_to_check: list[tuple[Any, str, Page | Section, str]] = []
 
@@ -206,7 +208,7 @@ class Site:
         # runs after everything is loaded, so internal links can point anywhere
         self.markdown = Markdown(
             self.config.highlight_theme if self.config.highlight_code else None,
-            language=self.config.language,
+            self.translations(),
         )
 
         for section in self.sections.values():
@@ -372,12 +374,23 @@ class Site:
             get_section=self.get_section,
             get_taxonomy_url=self.get_taxonomy_url,
             now=datetime.datetime.now,  # the time of the build, for things like the year in a copyright line
+            trans=self.trans,
         )
         return env
 
     def date_filter(self, value, format="%Y-%m-%d", locale=None) -> str:
         # month and day names follow the site's language, unless a template asks for another one
-        return format_date(value, format, locale or self.config.language) if value else ""
+        return format_date(value, format, self.translations(locale)) if value else ""
+
+    def translations(self, language: str | None = None) -> Translations:
+        language = base_language(language or self.config.language)
+        if language not in self.loaded_translations:
+            self.loaded_translations[language] = Translations(language, self.config.translations)
+        return self.loaded_translations[language]
+
+    def trans(self, key: str, lang: str | None = None):
+        # in templates: {{ trans("newer") }}, or {{ trans("newer", lang="en") }} for another language
+        return self.translations(lang)[key]
 
     def render(self, templates, path: str, **context):
         html = self.render_template(templates, path, **context)

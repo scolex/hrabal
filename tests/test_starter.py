@@ -58,6 +58,21 @@ def test_starter_loads_mermaid_only_where_needed(starter_dir):
     assert (public / "mermaid.js").exists()
 
 
+def test_starter_has_a_feed(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    index = (public / "index.html").read_text(encoding="utf-8")
+    assert (
+        '<link rel="alternate" type="application/atom+xml" title="My site" href="https://example.com/atom.xml">'
+        in index
+    )
+    feed = (public / "atom.xml").read_text(encoding="utf-8")
+    assert "<name>Your Name</name>" in feed
+    assert "Příliš hlučná samota" in feed
+    assert "Not ready yet" not in feed  # the draft
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

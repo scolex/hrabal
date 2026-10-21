@@ -1,9 +1,8 @@
 base_url = "https://example.com"
 title = "My site"
 description = "A site made with hrabal"
+author = "Your Name"
 taxonomies = ["tags"]
 highlight_theme = "monokai"
 language = "cs"
-
-[extra]
-author = "Your Name"
+generate_feeds = true

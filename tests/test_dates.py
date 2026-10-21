@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from hrabal import HrabalError
-from hrabal.dates import format_date
+from hrabal.dates import format_date, rfc822, rfc3339
 
 # a Wednesday
 DAY = datetime.date(2017, 3, 1)
@@ -48,3 +48,21 @@ def test_times_work_too():
 def test_unknown_locale_is_an_error():
     with pytest.raises(HrabalError, match="no month and day names for 'de'"):
         format_date(DAY, "%B", "de")
+
+
+@pytest.mark.parametrize(
+    "value, atom, rss",
+    [
+        (datetime.date(2017, 3, 1), "2017-03-01T00:00:00+00:00", "Wed, 01 Mar 2017 00:00:00 +0000"),
+        (datetime.datetime(2024, 5, 1, 9, 5), "2024-05-01T09:05:00+00:00", "Wed, 01 May 2024 09:05:00 +0000"),
+        (
+            datetime.datetime(2024, 5, 1, 9, 5, tzinfo=datetime.timezone(datetime.timedelta(hours=2))),
+            "2024-05-01T09:05:00+02:00",
+            "Wed, 01 May 2024 09:05:00 +0200",
+        ),
+        (None, "", ""),
+    ],
+)
+def test_feed_dates(value, atom, rss):
+    assert rfc3339(value) == atom
+    assert rfc822(value) == rss

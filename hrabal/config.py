@@ -10,6 +10,7 @@ class TaxonomyConfig:
     name: str
     paginate_by: int = 0
     paginate_path: str = "page"
+    feed: bool = False  # an atom.xml (or whatever feed_filenames says) for every term
 
 
 @dataclass
@@ -17,10 +18,15 @@ class Config:
     base_url: str
     title: str = ""
     description: str = ""
+    author: str = ""
     language: str = "en"
     taxonomies: list[TaxonomyConfig] = field(default_factory=list)
     highlight_code: bool = True
     highlight_theme: str = "monokai"
+    generate_sitemap: bool = True
+    generate_feeds: bool = False
+    feed_filenames: list[str] = field(default_factory=lambda: ["atom.xml"])
+    feed_limit: int = 0  # 0 puts every page with a date in the feed
     extra: dict = field(default_factory=dict)
 
 
@@ -41,7 +47,10 @@ def load_config(file: Path) -> Config:
         raise HrabalError(f"{file}: base_url is required")
 
     data["taxonomies"] = [load_taxonomy(file, entry) for entry in data.get("taxonomies", [])]
-    return Config(**data)
+    config = Config(**data)
+    if not isinstance(config.feed_limit, int) or config.feed_limit < 0:
+        raise HrabalError(f"{file}: feed_limit must be a positive number, or 0 for no limit")
+    return config
 
 
 def load_taxonomy(file: Path, entry: str | dict) -> TaxonomyConfig:

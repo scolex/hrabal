@@ -1,7 +1,10 @@
 base_url = "https://example.com"
 title = "Hrabal test site"
 description = "Everything hrabal can do, in one place"
-taxonomies = [{ name = "categories", paginate_by = 1 }, "podcast_authors"]
+author = "Test Author"
+generate_feeds = true
+feed_filenames = ["atom.xml", "rss.xml"]
+taxonomies = [{ name = "categories", paginate_by = 1, feed = true }, "podcast_authors"]
 
 [extra]
 author = "Test Author"

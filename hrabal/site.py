@@ -1,4 +1,6 @@
+import datetime
 import shutil
+from dataclasses import dataclass
 from html import escape
 from itertools import pairwise
 from pathlib import Path
@@ -21,9 +23,11 @@ from hrabal.content import (
     sort_pages,
     split_date,
 )
-from hrabal.dates import format_date
+from hrabal.dates import format_date, rfc822, rfc3339
 from hrabal.markdown import Markdown, has_mermaid
 from hrabal.pagination import Paginator, pager_url, paginate
+
+BUILTIN_TEMPLATES = Path(__file__).parent / "templates"
 
 REDIRECT = """<!doctype html>
 <html>
@@ -38,6 +42,12 @@ REDIRECT = """<!doctype html>
 </body>
 </html>
 """
+
+
+@dataclass
+class SitemapEntry:
+    permalink: str
+    date: datetime.date | None
 
 
 class Site:
@@ -165,6 +175,7 @@ class Site:
                 self.permalink(path),
                 paginate_by=settings.paginate_by,
                 paginate_path=settings.paginate_path,
+                feed=settings.feed,
             )
 
         for page in self.pages.values():
@@ -220,6 +231,7 @@ class Site:
 
     def write(self):
         self.templates = self.make_template_env()
+        self.rendered: list[str] = []  # paths of everything rendered from a template, for the sitemap
 
         for section in self.sections.values():
             if section.paginate_by:
@@ -258,6 +270,49 @@ class Site:
                 else:
                     self.render(single, term.path, taxonomy=taxonomy, term=term)
 
+        self.write_feeds()
+        if self.config.generate_sitemap:
+            self.write_sitemap()
+
+    def write_sitemap(self):
+        dates = {page.path: page.date for page in self.pages.values()}
+        entries = [SitemapEntry(self.permalink(path), dates.get(path)) for path in sorted(self.rendered)]
+        self.write_file("/sitemap.xml", self.render_template("sitemap.xml", "/sitemap.xml", entries=entries))
+
+    def write_feeds(self):
+        if self.config.generate_feeds:
+            self.write_feed("/", self.pages.values(), self.config.title, self.permalink("/"))
+
+        for section in self.sections.values():
+            if section.generate_feeds:
+                title = f"{self.config.title} · {section.title}" if section.title else self.config.title
+                self.write_feed(section.path, section.pages, title, section.permalink, section=section)
+
+        for taxonomy in self.taxonomies.values():
+            if taxonomy.feed:
+                for term in taxonomy.terms.values():
+                    title = f"{self.config.title} · {term.name}"
+                    self.write_feed(term.path, term.pages, title, term.permalink, taxonomy=taxonomy, term=term)
+
+    def write_feed(self, path: str, pages, title: str, link: str, **context):
+        # only pages with a date make sense in a feed, newest first, whatever order the section uses
+        pages = sort_pages([page for page in pages if page.date], "date")
+        if self.config.feed_limit:
+            pages = pages[: self.config.feed_limit]
+
+        for name in self.config.feed_filenames:
+            xml = self.render_template(
+                name,
+                path + name,
+                pages=pages,
+                title=title,
+                link=link,
+                feed_url=self.permalink(path + name),
+                last_updated=pages[0].date if pages else None,
+                **context,
+            )
+            self.write_file(path + name, xml)
+
     def render_pagers(self, templates, pagers: list[Paginator], paginate_path: str, **context):
         for paginator in pagers:
             self.render(templates, paginator.path, paginator=paginator, **context)
@@ -268,12 +323,15 @@ class Site:
 
     def make_template_env(self) -> jinja2.Environment:
         env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self.root / "templates"),
+            # the site's own templates first, then hrabal's built-in ones like sitemap.xml
+            loader=jinja2.FileSystemLoader([self.root / "templates", BUILTIN_TEMPLATES]),
             autoescape=jinja2.select_autoescape(["html", "xml"]),
             trim_blocks=True,
             lstrip_blocks=True,
         )
         env.filters["date"] = self.date_filter
+        env.filters["rfc3339"] = rfc3339
+        env.filters["rfc822"] = rfc822
         # jinja annotates globals after its own built-in ones, so widen the type before adding ours
         template_globals: dict[str, Any] = env.globals
         template_globals.update(
@@ -290,8 +348,15 @@ class Site:
         return format_date(value, format, locale or self.config.language) if value else ""
 
     def render(self, templates, path: str, **context):
+        html = self.render_template(templates, path, **context)
+        if self.inject_html:
+            html = html.replace("</body>", self.inject_html + "</body>")
+        self.write_html(path, html)
+        self.rendered.append(path)
+
+    def render_template(self, templates, path: str, **context) -> str:
         try:
-            html = self.templates.get_or_select_template(templates).render(**context)
+            return self.templates.get_or_select_template(templates).render(**context)
         except jinja2.TemplateNotFound as e:
             raise HrabalError(f"template not found: {e.message}") from None
         except jinja2.TemplateSyntaxError as e:
@@ -299,14 +364,13 @@ class Site:
         except jinja2.TemplateError as e:
             raise HrabalError(f"rendering {path} failed: {e}") from None
 
-        if self.inject_html:
-            html = html.replace("</body>", self.inject_html + "</body>")
-        self.write_html(path, html)
-
     def write_html(self, path: str, html: str):
-        target = self.output_dir / path.strip("/") / "index.html"
+        self.write_file(path.rstrip("/") + "/index.html", html)
+
+    def write_file(self, path: str, text: str):
+        target = self.output_dir / path.lstrip("/")
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(html, encoding="utf-8")
+        target.write_text(text, encoding="utf-8")
 
     # functions available in templates
 

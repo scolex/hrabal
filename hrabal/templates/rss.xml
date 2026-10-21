@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ title }}</title>
+    <link>{{ link }}</link>
+    <description>{{ config.description or title }}</description>
+    <language>{{ config.language }}</language>
+    <atom:link href="{{ feed_url }}" rel="self" type="application/rss+xml"/>
+{% if last_updated %}
+    <lastBuildDate>{{ last_updated | rfc822 }}</lastBuildDate>
+{% endif %}
+{% for page in pages %}
+    <item>
+      <title>{{ page.title }}</title>
+      <link>{{ page.permalink }}</link>
+      <guid>{{ page.permalink }}</guid>
+      <pubDate>{{ page.date | rfc822 }}</pubDate>
+      <description>{{ page.summary or page.content }}</description>
+    </item>
+{% endfor %}
+  </channel>
+</rss>

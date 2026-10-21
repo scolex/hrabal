@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ config.language }}">
+  <title>{{ title }}</title>
+{% if config.description %}
+  <subtitle>{{ config.description }}</subtitle>
+{% endif %}
+  <link rel="self" type="application/atom+xml" href="{{ feed_url }}"/>
+  <link rel="alternate" type="text/html" href="{{ link }}"/>
+  <id>{{ feed_url }}</id>
+{% if last_updated %}
+  <updated>{{ last_updated | rfc3339 }}</updated>
+{% endif %}
+{% if config.author %}
+  <author>
+    <name>{{ config.author }}</name>
+  </author>
+{% endif %}
+{% for page in pages %}
+  <entry>
+    <title>{{ page.title }}</title>
+    <link rel="alternate" type="text/html" href="{{ page.permalink }}"/>
+    <id>{{ page.permalink }}</id>
+    <published>{{ page.date | rfc3339 }}</published>
+    <updated>{{ page.date | rfc3339 }}</updated>
+{% if page.summary %}
+    <summary type="html">{{ page.summary }}</summary>
+{% endif %}
+    <content type="html" xml:base="{{ page.permalink }}">{{ page.content }}</content>
+  </entry>
+{% endfor %}
+</feed>

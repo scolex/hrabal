@@ -101,6 +101,38 @@ Pages and sections with a diagram have `has_mermaid` set, so a template can load
 The starter does that with `static/mermaid.js`, which also redraws the diagrams when the theme switches.
 It loads Mermaid from jsDelivr, pinned to one version, change the version there to upgrade.
 
+## Sitemap
+
+Every build writes `sitemap.xml` with every page it rendered: sections and each of their pagers,
+pages, taxonomy lists and terms. The `page/1/` redirects are left out, drafts are in only when
+they're built, and pages with a date get it as `<lastmod>`.
+
+To change how it looks, put your own `templates/sitemap.xml` in the site. It gets `entries`,
+each with a `permalink` and a `date` (or nothing). `generate_sitemap = false` in `config.toml`
+turns it off.
+
+## Feeds
+
+Atom by default, RSS if you like, or both:
+
+```toml
+author = "Your Name"                        # goes into the Atom feed
+generate_feeds = true                       # /atom.xml with every page that has a date
+feed_filenames = ["atom.xml", "rss.xml"]   # default is just atom.xml
+feed_limit = 20                             # newest 20 only, 0 (the default) means all
+taxonomies = [{ name = "tags", feed = true }]   # /tags/books/atom.xml for every term
+```
+
+A section can have its own feed too, with `generate_feeds = true` in its `_index.md`.
+Feeds hold only pages with a date, newest first, and skip drafts unless they're built.
+Dates in feeds are always in English and UTC, whatever the site's `language` is, because feed readers expect that.
+
+The feeds come from built-in `atom.xml` and `rss.xml` templates. A site can replace either with its
+own in `templates/`, or add another name to `feed_filenames` with a template to match. They get
+`pages`, `title`, `link` (the page the feed belongs to), `feed_url`, `last_updated` and, for section
+and term feeds, `section` or `taxonomy` and `term`. Two filters help with dates there:
+`{{ page.date | rfc3339 }}` for Atom and `{{ page.date | rfc822 }}` for RSS.
+
 ## Pagination
 
 Works like in Zola. Set `paginate_by` in a section's `_index.md` and its pages get split into pagers

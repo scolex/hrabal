@@ -19,6 +19,7 @@ SECTION_KEYS = {
     "paginate_by",
     "paginate_path",
     "paginate_reversed",
+    "generate_feeds",
     "extra",
 }
 SORT_OPTIONS = ("date", "title", "weight", "none")
@@ -61,6 +62,7 @@ class Section:
     paginate_by: int = 0  # 0 means one long list, no pagination
     paginate_path: str = "page"
     paginate_reversed: bool = False
+    generate_feeds: bool = False  # a feed of just this section's pages
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
@@ -85,6 +87,7 @@ class Taxonomy:
     permalink: str
     paginate_by: int = 0  # for the term pages, the list of all terms is never paginated
     paginate_path: str = "page"
+    feed: bool = False
     terms: dict[str, Term] = field(default_factory=dict, repr=False)
 
 

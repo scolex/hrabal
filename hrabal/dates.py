@@ -69,3 +69,22 @@ def format_date(value: datetime.date, format: str, locale: str) -> str:
         return (text.lstrip("0") or "0") if no_padding else text
 
     return DIRECTIVE.sub(replace, format)
+
+
+def as_moment(value: datetime.date) -> datetime.datetime:
+    # feeds want a full moment in time: a plain date counts as midnight, a time without a zone as UTC
+    if not isinstance(value, datetime.datetime):
+        value = datetime.datetime.combine(value, datetime.time())
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=datetime.UTC)
+    return value
+
+
+def rfc3339(value: datetime.date | None) -> str:
+    # for Atom: 2024-05-01T00:00:00+00:00
+    return as_moment(value).isoformat() if value else ""
+
+
+def rfc822(value: datetime.date | None) -> str:
+    # for RSS: Wed, 01 May 2024 00:00:00 +0000, always with English names whatever the site's language is
+    return format_date(as_moment(value), "%a, %d %b %Y %H:%M:%S %z", "en") if value else ""

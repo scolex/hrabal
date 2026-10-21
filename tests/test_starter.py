@@ -49,28 +49,23 @@ def test_starter_has_a_theme_switch(starter_dir):
     assert ':root[data-theme="dark"]' in (public / "style.css").read_text(encoding="utf-8")
 
 
-def test_starter_loads_mermaid_only_where_needed(starter_dir):
+def test_starter_can_draw_diagrams_and_math_on_every_page(starter_dir):
+    # the scripts themselves fetch Mermaid and KaTeX only when there's something to draw,
+    # so a summary with a formula gets drawn in the list of posts as well
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
-    assert '<script type="module" src="https://example.com/mermaid.js">' in tour
-    assert '<pre class="mermaid">' in tour
-    assert "mermaid.js" not in (public / "about" / "index.html").read_text(encoding="utf-8")
-    assert "mermaid.js" not in (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    for path in ("", "blog", "about", "tags/hrabal"):
+        page = (public / path / "index.html").read_text(encoding="utf-8")
+        assert '<script type="module" src="https://example.com/mermaid.js">' in page
+        assert '<script type="module" src="https://example.com/math.js">' in page
     assert (public / "mermaid.js").exists()
-
-
-def test_starter_loads_katex_only_where_needed(starter_dir):
-    Site(starter_dir).build()
-    public = starter_dir / "public"
+    assert (public / "math.js").exists()
 
     tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
-    assert '<script type="module" src="https://example.com/math.js">' in tour
+    assert '<pre class="mermaid">' in tour
     assert '<span class="math inline">e^{i\\pi} + 1 = 0</span>' in tour
     assert "$5 and $10" in tour
-    assert "math.js" not in (public / "about" / "index.html").read_text(encoding="utf-8")
-    assert (public / "math.js").exists()
 
 
 def test_starter_has_a_feed(starter_dir):

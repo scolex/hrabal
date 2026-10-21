@@ -17,12 +17,9 @@
   {% if config.generate_feeds %}
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url('atom.xml') }}">
   {% endif %}
-  {% if (page and page.has_mermaid) or (section and section.has_mermaid) %}
+  {# both are tiny and fetch Mermaid or KaTeX only when the page has a diagram or a formula #}
   <script type="module" src="{{ get_url('mermaid.js') }}"></script>
-  {% endif %}
-  {% if (page and page.has_math) or (section and section.has_math) %}
   <script type="module" src="{{ get_url('math.js') }}"></script>
-  {% endif %}
   {% if config.build_search_index %}
   <script type="module" src="{{ get_url('search.js') }}"></script>
   {% endif %}

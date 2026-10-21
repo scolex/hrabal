@@ -210,8 +210,10 @@ flowchart LR
 ````
 
 hrabal leaves their source as it is, in a `<pre class="mermaid">`, and the browser draws them.
-Pages and sections with a diagram have `has_mermaid` set, so a template can load Mermaid only there.
-The theme does that with `static/mermaid.js`, which also redraws the diagrams when light and dark switch.
+The theme draws them with `static/mermaid.js`, which every page loads, since a summary in a list of posts
+can have a diagram too. It's small and fetches Mermaid itself only when the page has a diagram, and it
+redraws them when light and dark switch. Pages and sections with a diagram have `has_mermaid` set,
+for a template of your own that wants to load Mermaid differently.
 It loads Mermaid from jsDelivr, pinned to one version, change the version there to upgrade.
 
 ## Math
@@ -228,8 +230,9 @@ A ```` ```math ```` code block works like `$$` too, the way GitHub writes it. hr
 is, in `<span class="math inline">` and `<div class="math block">`, and the browser typesets it with
 [KaTeX](https://katex.org/). Money is safe: there's no space right inside the dollars of a formula and
 no digit right after its closing one, so "$5 and $10" stays text, and `\$` is always a plain dollar.
-Pages and sections with math have `has_math` set, and the theme loads `static/math.js` only there,
-which brings KaTeX from jsDelivr, pinned to one version like Mermaid.
+The theme's `static/math.js` works like the one for diagrams: on every page, fetching KaTeX from
+jsDelivr only when there's a formula, pinned to one version. Pages and sections with math have
+`has_math` set.
 
 ## Sitemap
 

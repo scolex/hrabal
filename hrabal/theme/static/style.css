@@ -434,9 +434,10 @@ hr {
   text-decoration: underline;
 }
 
-/* the date of a post, close under its title and to the text that follows */
+/* the date of a post, halfway between its title and the text. In rem, since the title's em is twice
+   as big. The text's lines are taller than the title's, so their leading counts toward the gap below. */
 article > h1:has(+ time) {
-  margin-bottom: 0.25em;
+  margin-bottom: 0.75rem;
 }
 
 article > h1 + time {
@@ -444,7 +445,7 @@ article > h1 + time {
 }
 
 article > h1 + time + * {
-  margin-top: 0.75em;
+  margin-top: 0.5rem;
 }
 
 .updated {

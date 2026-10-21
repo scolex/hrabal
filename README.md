@@ -86,6 +86,7 @@ slug = "custom-url"        # default is the file name
 draft = true               # left out unless you pass --drafts
 weight = 10                # for sort_by = "weight"
 template = "special.html"
+aliases = ["/2016/old-post/", "old-post.html"]  # old addresses, see below
 
 [taxonomies]
 tags = ["books"]
@@ -96,8 +97,8 @@ anything = "you like"
 ```
 
 Sections take `title`, `description`, `sort_by` (`date`, `title`, `weight` or `none`),
-`weight`, `draft`, `template`, `page_template`, `paginate_by`, `paginate_path`, `paginate_reversed`
-and `extra`.
+`weight`, `draft`, `template`, `page_template`, `paginate_by`, `paginate_path`, `paginate_reversed`,
+`aliases` and `extra`.
 
 A draft section takes everything inside it along, subsections included.
 `page_template` applies to the subsections too, unless one of them sets its own.
@@ -111,6 +112,11 @@ The sitemap's `lastmod` and Atom's `<updated>` use the later of `date` and `upda
 get as `page.last_changed()`. The theme prints "Last edited" under a post that changed after its date.
 
 Put `<!-- more -->` in a page to mark where its summary ends.
+
+`aliases` keep old addresses working after a page moves or gets a new slug. Each one becomes a small
+page that sends readers on, like Zola's: `/2016/old-post/` gets an `index.html`, an alias ending in
+`.html` stays a file of that name. They stay out of the sitemap, and an alias that's already the address
+of a page, a section or another alias stops the build.
 
 ## Smaller marks
 

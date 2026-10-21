@@ -23,12 +23,13 @@ def test_pages_and_sections_are_in_the_sitemap(public):
 
 
 def test_every_built_page_is_listed_except_redirects(public):
-    built = {path.parent.relative_to(public).as_posix() for path in public.rglob("index.html")}
-    redirects = {path for path in built if path.endswith("page/1")}
+    built = {path.parent.relative_to(public).as_posix(): path for path in public.rglob("index.html")}
+    # page/1 of a paginated section and the aliases only send readers on, they're no pages of their own
+    redirects = {path for path, file in built.items() if 'http-equiv="refresh"' in file.read_text(encoding="utf-8")}
     listed = {url.removeprefix("https://example.com/").rstrip("/") for url in read_sitemap(public)}
 
-    assert redirects  # the test site does paginate
-    assert listed == {"" if path == "." else path for path in built - redirects}
+    assert {"posts/page/1", "learn"} <= redirects
+    assert listed == {"" if path == "." else path for path in built.keys() - redirects}
 
 
 def test_pagers_and_taxonomies_are_in_the_sitemap(public):

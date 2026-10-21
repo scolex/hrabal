@@ -18,6 +18,7 @@ from hrabal.content import (
     Section,
     Taxonomy,
     Term,
+    check_aliases,
     read_markdown,
     slugify,
     sort_pages,
@@ -112,6 +113,7 @@ class Site:
             raw_content=body,
             ancestors=list(ancestors),
         )
+        check_aliases(section.file, section.aliases)
         if section.sort_by not in SORT_OPTIONS:
             raise HrabalError(f"{section.file}: sort_by must be one of {', '.join(SORT_OPTIONS)}")
         if not isinstance(section.paginate_by, int) or section.paginate_by < 0:
@@ -169,6 +171,7 @@ class Site:
             raw_content=body,
             ancestors=[*section.ancestors, section],
         )
+        check_aliases(page.file, page.aliases)
         if is_bundle:
             page.assets = sorted(
                 f for f in file.parent.iterdir() if f.is_file() and f.suffix != ".md" and not f.name.startswith(".")
@@ -304,6 +307,7 @@ class Site:
                 else:
                     self.render(single, term.path, taxonomy=taxonomy, term=term)
 
+        self.write_aliases()
         # hosts show /404.html for an address that doesn't exist, it's no page of its own, so not in the sitemap
         self.write_file("/404.html", self.finish_html(self.render_template("404.html", "/404.html")))
 
@@ -315,6 +319,18 @@ class Site:
             self.write_file("/robots.txt", self.render_template("robots.txt", "/robots.txt"))
         if self.config.build_search_index:
             self.write_file("/search_index.json", search_index(list(self.pages.values())))
+
+    def write_aliases(self):
+        # a page that moved keeps its old address as an alias, and the alias sends readers on to the new one
+        taken = {path.rstrip("/") + "/index.html" for path in self.rendered}
+        for item in [*self.sections.values(), *self.pages.values()]:
+            for alias in item.aliases:
+                # like in Zola, "old-post.html" stays a file of that name and anything else becomes a folder
+                file = "/" + (alias if alias.endswith(".html") else alias.rstrip("/") + "/index.html").lstrip("/")
+                if file in taken:
+                    raise HrabalError(f"{item.file}: alias {alias} is already the address of something else")
+                taken.add(file)
+                self.write_file(file, REDIRECT.format(url=escape(item.permalink)))
 
     def write_sitemap(self):
         dates = {page.path: page.last_changed() for page in self.pages.values()}

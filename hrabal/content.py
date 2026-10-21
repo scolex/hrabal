@@ -19,6 +19,7 @@ PAGE_KEYS = {
     "template",
     "search",
     "taxonomies",
+    "aliases",
     "extra",
 }
 SECTION_KEYS = {
@@ -33,6 +34,7 @@ SECTION_KEYS = {
     "paginate_path",
     "paginate_reversed",
     "generate_feeds",
+    "aliases",
     "extra",
 }
 SORT_OPTIONS = ("date", "title", "weight", "none")
@@ -53,6 +55,7 @@ class Page:
     template: str = "page.html"
     search: bool = True  # false keeps the page out of search_index.json
     taxonomies: dict[str, list[str]] = field(default_factory=dict)
+    aliases: list[str] = field(default_factory=list)  # old addresses that send readers on to this page
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
@@ -85,6 +88,7 @@ class Section:
     paginate_path: str = "page"
     paginate_reversed: bool = False
     generate_feeds: bool = False  # a feed of just this section's pages
+    aliases: list[str] = field(default_factory=list)
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)
     content: str = field(default="", repr=False)
@@ -134,6 +138,14 @@ def read_markdown(file: Path, allowed_keys: set[str]) -> tuple[dict, str]:
         raise HrabalError(f"{file}: unknown front matter {', '.join(sorted(unknown))} (put your own under [extra])")
 
     return meta, parts[2]
+
+
+def check_aliases(file: Path, aliases):
+    if not isinstance(aliases, list) or not all(isinstance(alias, str) for alias in aliases):
+        raise HrabalError(f'{file}: aliases is a list of addresses, like aliases = ["/2016/old-post/"]')
+    for alias in aliases:
+        if "://" in alias or ".." in alias.split("/") or not alias.strip("/"):
+            raise HrabalError(f"{file}: alias {alias} has to be an address on this site, like /2016/old-post/")
 
 
 def sort_pages(pages: list[Page], sort_by: str) -> list[Page]:

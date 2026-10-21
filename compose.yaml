@@ -11,3 +11,12 @@ services:
       # set PUBLISH_ADDRESS=0.0.0.0 in .env to reach the dev server from other machines
       - "${PUBLISH_ADDRESS:-127.0.0.1}:1111:1111"
     init: true
+
+  # the starter's JavaScript, tested with node's own test runner
+  js:
+    image: node:22-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
+    command: ["node", "--test", "tests/js/*.test.mjs"]

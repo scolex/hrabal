@@ -27,6 +27,7 @@ class Config:
     generate_feeds: bool = False
     feed_filenames: list[str] = field(default_factory=lambda: ["atom.xml"])
     feed_limit: int = 0  # 0 puts every page with a date in the feed
+    build_search_index: bool = False
     extra: dict = field(default_factory=dict)
 
 

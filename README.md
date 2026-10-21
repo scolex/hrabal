@@ -133,6 +133,26 @@ own in `templates/`, or add another name to `feed_filenames` with a template to 
 and term feeds, `section` or `taxonomy` and `term`. Two filters help with dates there:
 `{{ page.date | rfc3339 }}` for Atom and `{{ page.date | rfc822 }}` for RSS.
 
+## Search
+
+With `build_search_index = true`, every build writes `search_index.json`, one entry per page:
+
+```json
+{"title": "…", "url": "…", "date": "2024-05-01", "description": "…", "tags": ["books"], "text": "…"}
+```
+
+`text` is the page without its HTML, scripts or diagram source, cut at 5000 characters.
+`search = false` in a page's front matter keeps it out, drafts are in only when they're built.
+
+hrabal only writes the index, the searching happens in the browser, in the starter's `static/search.js`.
+It fetches the index on the first keystroke, ignores case and diacritics (`zlutoucky kun` finds
+"Žluťoučký kůň"), wants every word to match the start of a word, and ranks title above tags above text.
+
+In the starter, the magnifying glass in the header opens search in an overlay, and so do `/` and
+Ctrl/⌘+K. Esc or a click outside closes it. Without JavaScript the same icon just goes to the search
+page (`content/search.md` with the `search.html` template), which also keeps the query in the url:
+`/search/?q=hrabal` opens with results.
+
 ## Pagination
 
 Works like in Zola. Set `paginate_by` in a section's `_index.md` and its pages get split into pagers
@@ -216,6 +236,7 @@ docker compose run --rm dev pytest
 docker compose run --rm dev ruff format
 docker compose run --rm dev ruff check
 docker compose run --rm dev ty check
+docker compose run --rm js              # the starter's JavaScript, with node's test runner
 ```
 
 Most tests run against `tests/test_site/`, a small site in the spirit of Zola's own test site.

@@ -93,6 +93,42 @@ def test_starter_icon_can_be_left_out(starter_dir):
     assert "<img" not in index
 
 
+def test_starter_has_a_search_page(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    page = (public / "search" / "index.html").read_text(encoding="utf-8")
+    assert '<div class="search search-page" data-index="https://example.com/search_index.json"' in page
+
+    index = (public / "search_index.json").read_text(encoding="utf-8")
+    assert "Příliš hlučná samota" in index
+    assert '"title":"Search"' not in index  # the search page keeps itself out
+    assert (public / "search.js").exists()
+
+
+def test_starter_opens_search_from_a_magnifying_glass(starter_dir):
+    Site(starter_dir).build()
+    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+
+    # a real link to the search page, which search.js turns into the overlay
+    assert '<a class="search-open" href="https://example.com/search/"' in index
+    assert index.index("search-open") < index.index("theme-switch")  # right before the theme switch
+    assert '<dialog class="search-dialog">' in index
+    assert (starter_dir / "public" / "search.svg").exists()  # the icon itself, style.css uses it as a mask
+    assert '<script type="module" src="https://example.com/search.js">' in index
+
+
+def test_starter_without_search_has_no_magnifying_glass(starter_dir):
+    config = starter_dir / "config.toml"
+    config.write_text(config.read_text(encoding="utf-8").replace("build_search_index = true\n", ""), encoding="utf-8")
+    Site(starter_dir).build()
+    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+
+    assert "search-open" not in index
+    assert "<dialog" not in index
+    assert "search.js" not in index
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

@@ -77,14 +77,32 @@ header nav a + a {
   margin-left: 1em;
 }
 
+/* search.svg gives the shape and the link color fills it, so the icon follows the theme */
+.search-open {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  background-color: var(--link);
+  -webkit-mask: url("search.svg") center / contain no-repeat;
+  mask: url("search.svg") center / contain no-repeat;
+}
+
 /* neat.css turns every button into a dark block, this one should look like the links next to it */
 .theme-switch,
 .theme-switch:hover {
-  margin-left: 1em;
   padding: 0;
   background: none;
   color: var(--link);
   font-size: 1.1em;
+}
+
+.theme-switch {
+  margin-left: 1em;
+}
+
+/* the two icons belong together, so they sit closer than the links */
+.search-open + .theme-switch {
+  margin-left: 0.5em;
 }
 
 time,
@@ -143,4 +161,41 @@ footer {
 pre.mermaid {
   background-color: transparent;
   text-align: center;
+}
+
+.search input {
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.search-results {
+  padding-left: 1.2em;
+}
+
+.search-results p {
+  margin: 0.2em 0 1em;
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* the overlay from the magnifying glass, a native <dialog> brings the dimming, Esc and focus handling */
+.search-dialog {
+  width: min(40em, 92vw);
+  max-height: 80vh;
+  margin: 10vh auto auto;
+  padding: 0;
+  border: none;
+  border-radius: 0.5em;
+  background-color: var(--light);
+  color: var(--dark);
+  box-shadow: 0 1em 3em rgb(0 0 0 / 0.35);
+}
+
+.search-dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.45);
+}
+
+/* padding lives on the box, so clicks on the dialog itself can only come from the backdrop */
+.search-dialog .search {
+  padding: 1.5em;
 }

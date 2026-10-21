@@ -26,6 +26,7 @@ from hrabal.content import (
 from hrabal.dates import format_date, rfc822, rfc3339
 from hrabal.markdown import Markdown, has_mermaid
 from hrabal.pagination import Paginator, pager_url, paginate
+from hrabal.search import search_index
 
 BUILTIN_TEMPLATES = Path(__file__).parent / "templates"
 
@@ -273,6 +274,8 @@ class Site:
         self.write_feeds()
         if self.config.generate_sitemap:
             self.write_sitemap()
+        if self.config.build_search_index:
+            self.write_file("/search_index.json", search_index(list(self.pages.values())))
 
     def write_sitemap(self):
         dates = {page.path: page.date for page in self.pages.values()}

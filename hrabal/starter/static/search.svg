@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- used as a mask in style.css, so only the shape counts, the color comes from the link -->
+  <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="black" stroke-width="2.2"/>
+  <path d="M15.5 15.5 21 21" stroke="black" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

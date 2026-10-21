@@ -4,6 +4,7 @@ description = "Everything hrabal can do, in one place"
 author = "Test Author"
 generate_feeds = true
 feed_filenames = ["atom.xml", "rss.xml"]
+build_search_index = true
 taxonomies = [{ name = "categories", paginate_by = 1, feed = true }, "podcast_authors"]
 
 [extra]

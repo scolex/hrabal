@@ -7,7 +7,7 @@ from pathlib import Path
 
 from hrabal import HrabalError
 
-PAGE_KEYS = {"title", "description", "date", "slug", "weight", "draft", "template", "taxonomies", "extra"}
+PAGE_KEYS = {"title", "description", "date", "slug", "weight", "draft", "template", "search", "taxonomies", "extra"}
 SECTION_KEYS = {
     "title",
     "description",
@@ -37,6 +37,7 @@ class Page:
     date: datetime.date | None = None
     weight: int = 0
     template: str = "page.html"
+    search: bool = True  # false keeps the page out of search_index.json
     taxonomies: dict[str, list[str]] = field(default_factory=dict)
     extra: dict = field(default_factory=dict)
     raw_content: str = field(default="", repr=False)

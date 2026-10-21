@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ page.title }}</h1>
+{{ page.content | safe }}
+
+{# the same search as the overlay, but it keeps the query in the url, so a search can be linked to #}
+<div class="search search-page" data-index="{{ get_url('search_index.json') }}" data-empty="Nothing found.">
+  <input type="search" placeholder="Search…" aria-label="Search" autofocus>
+  <ol class="search-results"></ol>
+</div>
+{% endblock %}

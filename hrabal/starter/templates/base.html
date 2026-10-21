@@ -17,6 +17,9 @@
   {% if (page and page.has_mermaid) or (section and section.has_mermaid) %}
   <script type="module" src="{{ get_url('mermaid.js') }}"></script>
   {% endif %}
+  {% if config.build_search_index %}
+  <script type="module" src="{{ get_url('search.js') }}"></script>
+  {% endif %}
 </head>
 <body>
   <header>
@@ -28,6 +31,10 @@
       <a href="{{ get_url('@/blog/_index.md') }}">Blog</a>
       <a href="{{ get_url('/tags/') }}">Tags</a>
       <a href="{{ get_url('@/about.md') }}">About</a>
+      {% if config.build_search_index %}
+      {# a plain link to the search page, search.js turns it into the overlay below #}
+      <a class="search-open" href="{{ get_url('@/search.md') }}" title="Search (/)" aria-label="Search"></a>
+      {% endif %}
       <button class="theme-switch" type="button" title="Switch between light and dark">◐</button>
     </nav>
   </header>
@@ -39,5 +46,14 @@
   <footer>
     {{ config.author }}
   </footer>
+
+  {% if config.build_search_index %}
+  <dialog class="search-dialog">
+    <div class="search" data-index="{{ get_url('search_index.json') }}" data-empty="Nothing found.">
+      <input type="search" placeholder="Search…" aria-label="Search">
+      <ol class="search-results"></ol>
+    </div>
+  </dialog>
+  {% endif %}
 </body>
 </html>

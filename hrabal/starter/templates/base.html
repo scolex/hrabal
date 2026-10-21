@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+  {% if config.extra.icon %}
+  <link rel="icon" href="{{ get_url(config.extra.icon) }}"{% if config.extra.icon.endswith(".svg") %} type="image/svg+xml"{% endif %}>
+  {% endif %}
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
   <script src="{{ get_url('theme.js') }}"></script>
@@ -17,7 +20,10 @@
 </head>
 <body>
   <header>
-    <a class="site-title" href="{{ get_url('/') }}">{{ config.title }}</a>
+    <a class="site-title" href="{{ get_url('/') }}">
+      {% if config.extra.icon %}<img src="{{ get_url(config.extra.icon) }}" alt="">{% endif %}
+      {{ config.title }}
+    </a>
     <nav>
       <a href="{{ get_url('@/blog/_index.md') }}">Blog</a>
       <a href="{{ get_url('/tags/') }}">Tags</a>

@@ -46,18 +46,31 @@ a {
 }
 
 .site-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   font-weight: bold;
   text-decoration: none;
+}
+
+.site-title img {
+  width: auto;
+  height: 2.25em; /* about 36px, like a Substack logo in its header */
 }
 
 header {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center; /* baseline would line the nav up with the bottom of the icon */
   justify-content: space-between;
   gap: 1em;
   padding-top: 2em;
   margin-bottom: 2em;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
 }
 
 header nav a + a {

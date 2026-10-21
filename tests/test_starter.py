@@ -73,6 +73,26 @@ def test_starter_has_a_feed(starter_dir):
     assert "Not ready yet" not in feed  # the draft
 
 
+def test_starter_icon_shows_next_to_the_title_and_as_favicon(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    index = (public / "index.html").read_text(encoding="utf-8")
+    assert '<link rel="icon" href="https://example.com/icon.svg" type="image/svg+xml">' in index
+    assert '<img src="https://example.com/icon.svg" alt="">' in index
+    assert (public / "icon.svg").exists()
+
+
+def test_starter_icon_can_be_left_out(starter_dir):
+    config = starter_dir / "config.toml"
+    config.write_text(config.read_text(encoding="utf-8").split("[extra]")[0], encoding="utf-8")
+    Site(starter_dir).build()
+
+    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    assert 'rel="icon"' not in index
+    assert "<img" not in index
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

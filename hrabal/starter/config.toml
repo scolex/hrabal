@@ -6,3 +6,6 @@ taxonomies = ["tags"]
 highlight_theme = "monokai"
 language = "cs"
 generate_feeds = true
+
+[extra]
+icon = "icon.svg" # a file in static/, shown next to the title and used as the favicon, leave it out for none

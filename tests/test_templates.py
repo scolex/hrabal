@@ -3,6 +3,9 @@
 
 from pathlib import Path
 
+import pytest
+
+from hrabal import HrabalError
 from hrabal.site import Site
 
 
@@ -76,6 +79,30 @@ def test_date_filter(public):
     assert "Date: 01. 03. 2017" in python
     assert "ISO date: 2017-03-01" in python
     assert "Date:" not in html(public, "hello")  # no date, nothing printed
+
+
+def test_date_filter_speaks_czech(public):
+    python = html(public, "posts/python")
+
+    assert "Czech date: 1. března 2017" in python
+    assert "Month in the site language: March" in python  # config.toml doesn't set a language
+
+
+def test_date_filter_follows_the_site_language(site_dir, tmp_path):
+    config = site_dir / "config.toml"
+    config.write_text('language = "cs"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    output = tmp_path / "czech"
+    Site(site_dir, output_dir=output).build()
+
+    assert "Month in the site language: března" in html(output, "posts/python")
+
+
+def test_date_filter_with_an_unknown_locale_stops_the_build(site_dir):
+    config = site_dir / "config.toml"
+    config.write_text('language = "tlh"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+
+    with pytest.raises(HrabalError, match="no month and day names for 'tlh'"):
+        Site(site_dir).build()
 
 
 def test_summary_and_content_are_rendered_apart(public):

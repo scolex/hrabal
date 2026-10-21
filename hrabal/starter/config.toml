@@ -3,6 +3,7 @@ title = "My site"
 description = "A site made with hrabal"
 taxonomies = ["tags"]
 highlight_theme = "monokai"
+language = "cs"
 
 [extra]
 author = "Your Name"

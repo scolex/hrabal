@@ -130,7 +130,19 @@ Everywhere you also get `config` and these functions:
 - `get_section("blog/_index.md")`
 - `get_taxonomy_url("tags", "books")`
 
-and a `date` filter: `{{ page.date | date("%d. %m. %Y") }}`.
+and a `date` filter, with the usual `strftime` codes: `{{ page.date | date("%d. %m. %Y") }}`.
+
+Month and day names follow `language` in `config.toml`, English and Czech are built in.
+A template can ask for another one with `locale`:
+
+```jinja
+{{ page.date | date("%-d. %B %Y", locale="cs") }}   {# 1. května 2024 #}
+{{ page.date | date("%OB %Y", locale="cs") }}       {# květen 2024, the month on its own #}
+{{ page.date | date("%A %-d. %-m.", locale="cs") }} {# středa 1. 5. #}
+```
+
+`%B` is the month as it's used inside a date ("1. května"), `%OB` the plain one ("květen").
+A minus, like in `%-d`, drops the leading zero. `cs_CZ` works as well as `cs`.
 
 Pages have `title`, `description`, `content`, `summary`, `date`, `permalink`, `path`, `slug`,
 `taxonomies`, `assets`, `extra`, `previous` and `next` (neighbours in the section's order).

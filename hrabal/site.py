@@ -21,6 +21,7 @@ from hrabal.content import (
     sort_pages,
     split_date,
 )
+from hrabal.dates import format_date
 from hrabal.markdown import Markdown
 from hrabal.pagination import Paginator, pager_url, paginate
 
@@ -270,7 +271,7 @@ class Site:
             trim_blocks=True,
             lstrip_blocks=True,
         )
-        env.filters["date"] = lambda value, format="%Y-%m-%d": value.strftime(format) if value else ""
+        env.filters["date"] = self.date_filter
         # jinja annotates globals after its own built-in ones, so widen the type before adding ours
         template_globals: dict[str, Any] = env.globals
         template_globals.update(
@@ -281,6 +282,10 @@ class Site:
             get_taxonomy_url=self.get_taxonomy_url,
         )
         return env
+
+    def date_filter(self, value, format="%Y-%m-%d", locale=None) -> str:
+        # month and day names follow the site's language, unless a template asks for another one
+        return format_date(value, format, locale or self.config.language) if value else ""
 
     def render(self, templates, path: str, **context):
         try:

@@ -27,6 +27,7 @@ class ThemeConfig:
     home_posts: str = ""  # the section whose newest posts the home page lists, like "blog/_index.md"
     icon: str = "icon.svg"  # a file in static/, shown before the title and as the favicon, "" for none
     copyright_since: int = 0  # the first year in the footer, 0 shows just this year
+    breadcrumbs: bool = False  # the sections above a page, over its heading
 
 
 @dataclass
@@ -93,6 +94,8 @@ def load_theme(file: Path, table) -> ThemeConfig:
                 f'{file}: every menu item needs a title and a url, like {{ title = "Blog", url = "/blog/" }}'
             )
         menu.append(MenuItem(**item))
+    if not isinstance(table.get("breadcrumbs", False), bool):
+        raise HrabalError(f"{file}: breadcrumbs is either true or false")
     return ThemeConfig(**(table | {"menu": menu}))
 
 

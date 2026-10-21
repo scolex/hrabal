@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% from "macros.html" import breadcrumbs %}
 
 {% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
 {% block description %}{{ page.description or config.description }}{% endblock %}
 
 {% block content %}
 <article>
+  {{ breadcrumbs(page.ancestors) }}
   <h1>{{ page.title }}</h1>
   {% if page.date %}<time>{{ page.date | date(trans("date_long")) }}</time>{% endif %}
 

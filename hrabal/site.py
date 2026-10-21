@@ -90,7 +90,7 @@ class Site:
         self.collect_taxonomies()
         self.render_content()
 
-    def load_section(self, directory: Path, page_template="page.html") -> Section | None:
+    def load_section(self, directory: Path, page_template="page.html", ancestors=()) -> Section | None:
         relative = directory.relative_to(self.content_dir)
         index = directory / "_index.md"
         meta, body = read_markdown(index, SECTION_KEYS) if index.exists() else ({}, "")
@@ -110,6 +110,7 @@ class Site:
             path=path,
             permalink=self.permalink(path),
             raw_content=body,
+            ancestors=list(ancestors),
         )
         if section.sort_by not in SORT_OPTIONS:
             raise HrabalError(f"{section.file}: sort_by must be one of {', '.join(SORT_OPTIONS)}")
@@ -123,7 +124,7 @@ class Site:
             if child.is_dir():
                 if (child / "index.md").exists() and not (child / "_index.md").exists():
                     self.load_page(child / "index.md", section)
-                elif subsection := self.load_section(child, section.page_template):
+                elif subsection := self.load_section(child, section.page_template, [*ancestors, section]):
                     section.subsections.append(subsection)
             elif child.name == "index.md":
                 folder = child.parent.relative_to(self.root)
@@ -166,6 +167,7 @@ class Site:
             path=path,
             permalink=self.permalink(path),
             raw_content=body,
+            ancestors=[*section.ancestors, section],
         )
         if is_bundle:
             page.assets = sorted(

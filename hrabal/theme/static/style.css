@@ -394,6 +394,32 @@ hr {
   margin-bottom: 1em;
 }
 
+/* breadcrumbs: the sections above a page, small and quiet over its heading */
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 -0.4em;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9em;
+}
+
+.breadcrumbs li + li::before {
+  content: "›";
+  margin: 0 0.5em;
+  color: var(--muted);
+}
+
+.breadcrumbs a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--link);
+  text-decoration: underline;
+}
+
 .updated {
   margin-top: 2em;
   color: var(--muted);

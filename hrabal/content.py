@@ -62,6 +62,7 @@ class Page:
     assets: list[Path] = field(default_factory=list)
     previous: Page | None = field(default=None, repr=False)
     next: Page | None = field(default=None, repr=False)
+    ancestors: list[Section] = field(default_factory=list, repr=False)  # the sections above, the home page first
 
     def last_changed(self) -> datetime.date | None:
         # the later of date and updated, what sitemaps and feeds call the last update
@@ -91,6 +92,7 @@ class Section:
     has_mermaid: bool = False
     pages: list[Page] = field(default_factory=list, repr=False)
     subsections: list[Section] = field(default_factory=list, repr=False)
+    ancestors: list[Section] = field(default_factory=list, repr=False)
 
 
 @dataclass(eq=False)

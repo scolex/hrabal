@@ -81,6 +81,17 @@ def test_first_and_last_pages_have_one_neighbour(site_dir):
     assert posts[-1].next is None
 
 
+def test_ancestors_go_from_the_home_page_down(site_dir):
+    site = load(site_dir)
+    docker = site.pages["posts/tutorials/devops/docker.md"]
+
+    assert titles(docker.ancestors) == ["Home", "Posts", "Tutorials", "DevOps"]
+    assert docker.ancestors[-1] is site.sections["posts/tutorials/devops/_index.md"]
+    assert titles(site.sections["posts/tutorials/_index.md"].ancestors) == ["Home", "Posts"]
+    assert titles(site.pages["hello.md"].ancestors) == ["Home"]
+    assert site.sections["_index.md"].ancestors == []
+
+
 def test_section_extra_is_available(site_dir):
     programming = load(site_dir).sections["posts/tutorials/programming/_index.md"]
     assert programming.extra == {"we_have_extra": "variables"}

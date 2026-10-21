@@ -51,9 +51,8 @@ lives at `/hello/` and is dated May 1st, unless the front matter says otherwise.
 
 hrabal's look lives in `hrabal/theme/`: its templates, [Neat CSS](https://github.com/codazoda/neatcss)
 with a warm palette on top, light and dark with a switch, search behind a magnifying glass, a sandwich
-menu on small screens, copy buttons on code, alerts, diagrams, footnotes and a friendly 404 page.
-A site sets it up in a
-`[theme]` table:
+menu on small screens, breadcrumbs if you want them, copy buttons on code, alerts, diagrams, footnotes
+and a friendly 404 page. A site sets it up in a `[theme]` table:
 
 ```toml
 [theme]
@@ -65,6 +64,7 @@ menu = [                              # the links in the header, none without it
 home_posts = "blog/_index.md"         # the section whose newest posts the home page lists
 icon = "icon.svg"                     # before the title and as the favicon, "" for none, the default is a bale
 copyright_since = 2024                # the first year in the footer, the last one is always this year
+breadcrumbs = true                    # Home › Blog over the headings of pages deeper down, off by default
 ```
 
 Its words follow the site's language, see [Languages](#languages). To change any part of it, put a file
@@ -318,6 +318,8 @@ Formats with numbers only, like `%Y-%m-%d`, work in any language.
 Pages have `title`, `description`, `content`, `summary`, `date`, `permalink`, `path`, `slug`,
 `taxonomies`, `assets`, `extra`, `previous` and `next` (neighbours in the section's order).
 Sections have `title`, `description`, `content`, `pages`, `subsections`, `permalink`, `path` and `extra`.
+Both have `ancestors`, the sections above them from the home page down. Unlike Zola's, they are the
+sections themselves, not their file names, so `{{ page.ancestors[-1].title }}` just works.
 `draft` only decides whether something gets built, templates don't see it.
 
 ## Languages

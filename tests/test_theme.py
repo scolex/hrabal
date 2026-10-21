@@ -108,6 +108,7 @@ def test_taxonomy_without_a_translation_still_gets_a_title(plain_site):
         ('theme = "fancy"\n', "theme settings go in a \\[theme\\] table"),
         ("[theme]\ncolours = 3\n", "unknown theme settings colours"),
         ('[theme]\nmenu = [{ title = "Blog" }]\n', "every menu item needs a title and a url"),
+        ('[theme]\nbreadcrumbs = "yes"\n', "breadcrumbs is either true or false"),
     ],
 )
 def test_theme_settings_are_checked(plain_site, theme, error):
@@ -140,6 +141,41 @@ def test_starter_builds_from_a_copy(tmp_path):
 
 
 # the 404 page
+
+
+def test_no_breadcrumbs_unless_asked_for(plain_site):
+    assert "breadcrumbs" not in html(build(plain_site), "blog/first")
+
+
+def test_breadcrumbs_lead_from_home_to_the_section(plain_site):
+    configure(plain_site, "[theme]\nbreadcrumbs = true\n")
+    post = html(build(plain_site), "blog/first")
+
+    assert '<nav class="breadcrumbs" aria-label="Breadcrumbs">' in post
+    assert '<li><a href="https://example.com/">Home</a></li>' in post
+    assert '<li><a href="https://example.com/blog/">Blog</a></li>' in post
+    assert "<li><a" not in post.split("<h1>")[1]  # the page's own title is the heading, not a crumb
+
+
+def test_nested_sections_get_breadcrumbs_in_the_site_language(plain_site):
+    configure(plain_site, 'language = "cs"\n[theme]\nbreadcrumbs = true\n')
+    books = plain_site / "content" / "blog" / "books"
+    books.mkdir()
+    (books / "_index.md").write_text('+++\ntitle = "Knihy"\n+++\n', encoding="utf-8")
+    page = html(build(plain_site), "blog/books")
+
+    assert 'aria-label="Drobečková navigace"' in page
+    assert '<a href="https://example.com/">Úvod</a>' in page
+    assert '<a href="https://example.com/blog/">Blog</a>' in page
+
+
+def test_no_breadcrumbs_right_under_the_home_page(plain_site):
+    configure(plain_site, "[theme]\nbreadcrumbs = true\n")
+    (plain_site / "content" / "about.md").write_text('+++\ntitle = "About"\n+++\n', encoding="utf-8")
+    public = build(plain_site)
+
+    for path in ("", "about", "blog"):
+        assert "breadcrumbs" not in html(public, path)
 
 
 def test_every_build_has_a_404_page(plain_site):

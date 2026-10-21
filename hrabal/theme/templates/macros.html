@@ -9,3 +9,17 @@
   {% endfor %}
 </ul>
 {% endmacro %}
+
+{# with breadcrumbs = true in [theme]: the sections above a page, from the home page down. Not the page itself, its heading comes right
+   under them. A page straight under the home page gets none, a single "Home" would say nothing. #}
+{% macro breadcrumbs(ancestors) %}
+{% if config.theme.breadcrumbs and ancestors | length > 1 %}
+<nav class="breadcrumbs" aria-label="{{ trans('breadcrumbs') }}">
+  <ol>
+    {% for section in ancestors %}
+    <li><a href="{{ section.permalink }}">{{ trans("home") if loop.first else section.title }}</a></li>
+    {% endfor %}
+  </ol>
+</nav>
+{% endif %}
+{% endmacro %}

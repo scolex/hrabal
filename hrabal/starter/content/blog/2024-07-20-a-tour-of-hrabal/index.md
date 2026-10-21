@@ -21,6 +21,10 @@ Paragraphs are plain text with an empty line between them. Inside a paragraph, w
 *italic* or ~~struck out~~, `code` can be marked, and links go anywhere on the web, like to
 [Zola](https://www.getzola.org/), which hrabal borrows a lot from.[^zola]
 
+A few smaller ones: `~` around text makes it lower, like in H~2~O, `^` raises it, like in E = mc^2^,
+and `==` marks it, so ==the important part== stands out. Keys to press have no markdown of their own,
+but a bit of HTML does it: <kbd>Ctrl</kbd> + <kbd>K</kbd>.
+
 A footnote is a `[^name]` in the text and a `[^name]: …` line anywhere in the post.[^name] It gets
 a number of its own and ends up at the bottom of the page, with a link back to where it was used.
 
@@ -151,7 +155,8 @@ The picture is a file in this post's folder. A link to it with `@/` gets checked
 
 ## A bit of HTML
 
-Markdown lets HTML through, for the things it has no syntax for:
+Markdown lets HTML through, for the things it has no syntax for, like an
+<abbr title="HyperText Markup Language">HTML</abbr> abbreviation that explains itself on hover, or this:
 
 <details>
 <summary>Click to see more</summary>

@@ -4,6 +4,8 @@ from urllib.parse import unquote
 from markdown_it import MarkdownIt
 from markdown_it.common.utils import escapeHtml
 from mdit_py_plugins.footnote import footnote_plugin
+from mdit_py_plugins.subscript import sub_plugin
+from mdit_py_plugins.superscript import superscript_plugin
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -15,6 +17,7 @@ from hrabal import HrabalError
 from hrabal.alerts import github_alerts
 from hrabal.anchors import heading_ids
 from hrabal.i18n import ENGLISH, Translations
+from hrabal.marks import mark
 
 MERMAID = '<pre class="mermaid">'
 FOOTNOTE_REF = re.compile(r"\[\^[^\]\s]+\](?!:)")  # [^1] in the text, but not the [^1]: that defines it
@@ -27,7 +30,9 @@ class Markdown:
             self.setup_highlighting(highlight_theme)
             options["highlight"] = self.highlight_code
 
-        self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"]).use(footnote_plugin)
+        self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
+        self.md.use(footnote_plugin).use(sub_plugin).use(superscript_plugin)  # H~2~O and x^2^
+        self.md.inline.ruler.before("emphasis", "mark", mark)
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
         self.md.add_render_rule("fence", render_fence)

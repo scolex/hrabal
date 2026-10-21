@@ -145,6 +145,38 @@ pre {
   border-radius: 0.375em;
 }
 
+/* a key to press, drawn as a small keycap */
+kbd {
+  padding: 0.05em 0.4em;
+  border: 1px solid color-mix(in srgb, var(--muted) 50%, transparent);
+  border-bottom-width: 2px;
+  border-radius: 0.3em;
+  background-color: var(--lesslight);
+  font-family: monospace;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+/* ==marked== text, a light stroke of the link brown instead of the browser's yellow */
+mark {
+  padding: 0 0.15em;
+  border-radius: 0.2em;
+  background-color: color-mix(in srgb, var(--link) 25%, transparent);
+  color: inherit;
+}
+
+/* keeps H~2~O from pushing its line apart from the others */
+sub,
+sup {
+  line-height: 0;
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
 /* copy.js wraps every code block in .code-block and adds the button */
 .code-block {
   position: relative;

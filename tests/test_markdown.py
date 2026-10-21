@@ -194,3 +194,36 @@ def test_footnote_reference_in_code_stays_code():
 def test_summaries_lose_their_footnote_references():
     text = "Summary[^a] with[^long-name] notes.\n\n[^a]: Kept, it's not a reference.\n"
     assert without_footnote_refs(text) == "Summary with notes.\n\n[^a]: Kept, it's not a reference.\n"
+
+
+# sub, sup and mark
+
+
+def test_sub_sup_and_mark():
+    html = render("H~2~O, E = mc^2^ and ==the important part==\n")
+    assert html == "<p>H<sub>2</sub>O, E = mc<sup>2</sup> and <mark>the important part</mark></p>\n"
+
+
+def test_strikethrough_still_works_next_to_sub():
+    assert render("~~gone~~ and H~2~O\n") == "<p><s>gone</s> and H<sub>2</sub>O</p>\n"
+
+
+def test_mark_holds_markdown():
+    html = render("==**bold** and `a == b`==\n")
+    assert html == "<p><mark><strong>bold</strong> and <code>a == b</code></mark></p>\n"
+
+
+@pytest.mark.parametrize("text", ["a == b == c", "x ==a", "===", "== ==", "`==code==`"])
+def test_not_every_equals_sign_is_a_mark(text):
+    assert "<mark>" not in render(text + "\n")
+
+
+def test_mark_and_links_go_both_ways():
+    html = render("[==link==](/a) ==[mark](/b)==\n")
+    assert '<a href="/a"><mark>link</mark></a> <mark><a href="/b">mark</a></mark>' in html
+
+
+def test_footnotes_still_win_over_sup():
+    html = render("Text[^a] and x^2^.\n\n[^a]: Note.\n")
+    assert 'class="footnote-ref"' in html
+    assert "x<sup>2</sup>" in html

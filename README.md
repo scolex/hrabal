@@ -112,6 +112,17 @@ get as `page.last_changed()`. The theme prints "Last edited" under a post that c
 
 Put `<!-- more -->` in a page to mark where its summary ends.
 
+## Smaller marks
+
+```markdown
+H~2~O, E = mc^2^ and ==the important part==
+```
+
+`~` around text makes it `<sub>`, `^` makes it `<sup>` and `==` makes it `<mark>`. The first two are
+from `mdit-py-plugins` and take a single word, the text between `==` can be any markdown, like
+`==**this**==`. `~~` still strikes text out. Markdown lets HTML through for the rest, so
+`<kbd>Ctrl</kbd>` and `<abbr title="…">` work too, and the theme styles all of them.
+
 ## Footnotes
 
 ```markdown

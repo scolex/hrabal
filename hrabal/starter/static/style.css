@@ -64,8 +64,8 @@ header {
   align-items: center; /* baseline would line the nav up with the bottom of the icon */
   justify-content: space-between;
   gap: 1em;
-  padding-top: 2em;
-  margin-bottom: 2em;
+  padding-top: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 header nav {

@@ -10,3 +10,8 @@ and [a nested section](@/posts/tutorials/_index.md).
 | Name | Value |
 |------|-------|
 | a    | 1     |
+
+```mermaid
+flowchart LR
+    hello --> world
+```

@@ -47,6 +47,17 @@ def test_starter_has_a_theme_switch(starter_dir):
     assert ':root[data-theme="dark"]' in (public / "style.css").read_text(encoding="utf-8")
 
 
+def test_starter_loads_mermaid_only_where_needed(starter_dir):
+    Site(starter_dir).build()
+    public = starter_dir / "public"
+
+    about = (public / "about" / "index.html").read_text(encoding="utf-8")
+    assert '<script type="module" src="https://example.com/mermaid.js">' in about
+    assert '<pre class="mermaid">' in about
+    assert "mermaid.js" not in (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    assert (public / "mermaid.js").exists()
+
+
 def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"

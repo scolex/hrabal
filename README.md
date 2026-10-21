@@ -85,6 +85,22 @@ Files that live in a page folder work the same way, in links and images:
 `![photo](@/blog/with-pictures/photo.jpg)`.
 Links get checked during the build, so a broken one stops it.
 
+## Diagrams
+
+Code blocks marked `mermaid` become [Mermaid](https://mermaid.js.org/) diagrams:
+
+````markdown
+```mermaid
+flowchart LR
+    write --> build --> publish
+```
+````
+
+hrabal leaves their source as it is, in a `<pre class="mermaid">`, and the browser draws them.
+Pages and sections with a diagram have `has_mermaid` set, so a template can load Mermaid only there.
+The starter does that with `static/mermaid.js`, which also redraws the diagrams when the theme switches.
+It loads Mermaid from jsDelivr, pinned to one version, change the version there to upgrade.
+
 ## Pagination
 
 Works like in Zola. Set `paginate_by` in a section's `_index.md` and its pages get split into pagers

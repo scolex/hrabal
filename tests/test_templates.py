@@ -152,6 +152,14 @@ def test_page_templates_are_used_for_rendering(public):
     assert html(pages, "yet-another-section/post") == "from child section: Local section override"
 
 
+def test_pages_know_when_they_have_a_diagram(public):
+    hello = html(public, "hello")
+
+    assert "Mermaid: yes" in hello
+    assert '<pre class="mermaid">flowchart LR\n    hello --&gt; world\n</pre>' in hello
+    assert "Mermaid: yes" not in html(public, "posts/python")
+
+
 def test_markdown_tables_and_strikethrough(public):
     hello = html(public, "hello")
 

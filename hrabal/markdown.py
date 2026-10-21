@@ -1,6 +1,7 @@
 from urllib.parse import unquote
 
 from markdown_it import MarkdownIt
+from markdown_it.common.utils import escapeHtml
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
@@ -9,6 +10,8 @@ from pygments.token import Text
 from pygments.util import ClassNotFound
 
 from hrabal import HrabalError
+
+MERMAID = '<pre class="mermaid">'
 
 
 class Markdown:
@@ -21,6 +24,7 @@ class Markdown:
         self.md = MarkdownIt("commonmark", options).enable(["table", "strikethrough"])
         self.md.add_render_rule("link_open", render_link)
         self.md.add_render_rule("image", render_image)
+        self.md.add_render_rule("fence", render_fence)
 
     def render(self, text: str, resolve_link) -> str:
         return self.md.render(text, {"resolve_link": resolve_link})
@@ -44,6 +48,18 @@ class Markdown:
             return ""  # markdown-it falls back to plain escaped code
         html = highlight(code, lexer, self.formatter)
         return f'<pre class="highlight" style="{self.pre_style}"><code>{html}</code></pre>'
+
+
+def render_fence(renderer, tokens, idx, options, env):
+    # mermaid diagrams are drawn in the browser, so they keep their source untouched instead of getting highlighted
+    token = tokens[idx]
+    if token.info.split(maxsplit=1)[:1] == ["mermaid"]:
+        return f"{MERMAID}{escapeHtml(token.content)}</pre>\n"
+    return renderer.fence(tokens, idx, options, env)
+
+
+def has_mermaid(html: str) -> bool:
+    return MERMAID in html
 
 
 def render_link(renderer, tokens, idx, options, env):

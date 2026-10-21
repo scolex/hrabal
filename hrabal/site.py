@@ -22,7 +22,7 @@ from hrabal.content import (
     split_date,
 )
 from hrabal.dates import format_date
-from hrabal.markdown import Markdown
+from hrabal.markdown import Markdown, has_mermaid
 from hrabal.pagination import Paginator, pager_url, paginate
 
 REDIRECT = """<!doctype html>
@@ -190,9 +190,11 @@ class Site:
 
         for section in self.sections.values():
             section.content = self.render_markdown(section.raw_content, section.file)
+            section.has_mermaid = has_mermaid(section.content)
 
         for page in self.pages.values():
             page.content = self.render_markdown(page.raw_content, page.file)
+            page.has_mermaid = has_mermaid(page.content)
             summary, more, _ = page.raw_content.partition("<!-- more -->")
             if more:
                 page.summary = self.render_markdown(summary, page.file)

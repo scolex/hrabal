@@ -29,6 +29,9 @@ Next: {{ page.next.title }}
 Term: {{ name }}/{{ term }} -> {{ get_taxonomy_url(name, term) }}
 {% endfor %}
 {% endfor %}
+{% if page.has_mermaid %}
+Mermaid: yes
+{% endif %}
 {% for asset in page.assets %}
 Asset: {{ asset.name }}
 {% endfor %}

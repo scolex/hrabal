@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="{{ get_url('neat.css') }}">
   <link rel="stylesheet" href="{{ get_url('style.css') }}">
   <script src="{{ get_url('theme.js') }}"></script>
+  {% if (page and page.has_mermaid) or (section and section.has_mermaid) %}
+  <script type="module" src="{{ get_url('mermaid.js') }}"></script>
+  {% endif %}
 </head>
 <body>
   <header>

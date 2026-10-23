@@ -5,9 +5,12 @@ import time
 from pathlib import Path
 
 from hrabal import HrabalError, __version__
-from hrabal.links import find_broken
-from hrabal.server import serve
-from hrabal.site import Site
+
+# loaded on first use, so a command only pays for what it needs: hrabal --version and hrabal init
+# never load Jinja, markdown-it or Pygments, and only hrabal check loads the link checker
+lazy from hrabal.links import find_broken
+lazy from hrabal.server import serve
+lazy from hrabal.site import Site
 
 STARTER = Path(__file__).parent / "starter"
 

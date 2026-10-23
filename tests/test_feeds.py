@@ -23,7 +23,7 @@ def rss_items(file: Path) -> list[ET.Element]:
 
 def configure(site_dir: Path, lines: str):
     config = site_dir / "config.toml"
-    config.write_text(lines + "\n" + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text(lines + "\n" + config.read_text())
 
 
 def test_site_feed_has_every_dated_page_newest_first(public):
@@ -97,7 +97,7 @@ def test_drafts_stay_out_of_the_feed(public):
 
 
 def test_feeds_are_not_in_the_sitemap(public):
-    assert "atom.xml" not in (public / "sitemap.xml").read_text(encoding="utf-8")
+    assert "atom.xml" not in (public / "sitemap.xml").read_text()
 
 
 def test_feed_limit(site_dir):
@@ -109,7 +109,7 @@ def test_feed_limit(site_dir):
 
 def test_site_feed_is_off_unless_asked_for(site_dir):
     config = site_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").replace("generate_feeds = true\n", ""), encoding="utf-8")
+    config.write_text(config.read_text().replace("generate_feeds = true\n", ""))
     Site(site_dir).build()
 
     assert not (site_dir / "public" / "atom.xml").exists()
@@ -117,16 +117,16 @@ def test_site_feed_is_off_unless_asked_for(site_dir):
 
 
 def test_site_can_bring_its_own_feed_template(site_dir):
-    (site_dir / "templates" / "atom.xml").write_text("{{ pages | length }} pages in {{ title }}", encoding="utf-8")
+    (site_dir / "templates" / "atom.xml").write_text("{{ pages | length }} pages in {{ title }}")
     Site(site_dir).build()
 
-    assert (site_dir / "public" / "atom.xml").read_text(encoding="utf-8") == "8 pages in Hrabal test site"
+    assert (site_dir / "public" / "atom.xml").read_text() == "8 pages in Hrabal test site"
 
 
 def test_feed_without_a_template_stops_the_build(site_dir):
     config = site_dir / "config.toml"
-    text = config.read_text(encoding="utf-8").replace('["atom.xml", "rss.xml"]', '["feed.json"]')
-    config.write_text(text, encoding="utf-8")
+    text = config.read_text().replace('["atom.xml", "rss.xml"]', '["feed.json"]')
+    config.write_text(text)
     with pytest.raises(HrabalError, match=r"feed\.json"):
         Site(site_dir).build()
 

@@ -8,7 +8,7 @@ Named after Bohumil Hrabal, who knew a thing or two about pressing a lot of pape
 
 ## Getting started
 
-Needs Python 3.14.
+Needs Python 3.15.
 
 ```sh
 uv tool install .

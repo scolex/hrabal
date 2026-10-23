@@ -25,7 +25,7 @@ def test_pages_and_sections_are_in_the_sitemap(public):
 def test_every_built_page_is_listed_except_redirects(public):
     built = {path.parent.relative_to(public).as_posix(): path for path in public.rglob("index.html")}
     # page/1 of a paginated section and the aliases only send readers on, they're no pages of their own
-    redirects = {path for path, file in built.items() if 'http-equiv="refresh"' in file.read_text(encoding="utf-8")}
+    redirects = {path for path, file in built.items() if 'http-equiv="refresh"' in file.read_text()}
     listed = {url.removeprefix("https://example.com/").rstrip("/") for url in read_sitemap(public)}
 
     assert {"posts/page/1", "learn"} <= redirects
@@ -69,15 +69,15 @@ def test_sitemap_follows_the_base_url(site_dir, tmp_path):
 
 
 def test_site_can_bring_its_own_sitemap_template(site_dir):
-    (site_dir / "templates" / "sitemap.xml").write_text("{{ entries | length }} urls", encoding="utf-8")
+    (site_dir / "templates" / "sitemap.xml").write_text("{{ entries | length }} urls")
     Site(site_dir).build()
 
-    assert (site_dir / "public" / "sitemap.xml").read_text(encoding="utf-8") == "46 urls"
+    assert (site_dir / "public" / "sitemap.xml").read_text() == "46 urls"
 
 
 def test_sitemap_can_be_turned_off(site_dir):
     config = site_dir / "config.toml"
-    config.write_text("generate_sitemap = false\n" + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text("generate_sitemap = false\n" + config.read_text())
     Site(site_dir).build()
 
     assert not (site_dir / "public" / "sitemap.xml").exists()

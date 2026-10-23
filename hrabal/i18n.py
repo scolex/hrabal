@@ -19,7 +19,7 @@ class Translations:
     def __init__(self, language: str, site: dict[str, dict] | None = None):
         self.language = base_language(language)
         built_in = BUILT_IN / f"{self.language}.toml"
-        self.strings = tomllib.loads(built_in.read_text(encoding="utf-8")) if built_in.exists() else {}
+        self.strings = tomllib.loads(built_in.read_text()) if built_in.exists() else {}
         for name, strings in (site or {}).items():
             if base_language(name) == self.language:
                 self.strings.update(strings)

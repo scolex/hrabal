@@ -17,7 +17,7 @@ def write_files(root: Path, files: dict[str, str]):
     for name, text in files.items():
         path = root / name
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        path.write_text(text)
 
 
 def load(root: Path, **options) -> Site:
@@ -296,7 +296,7 @@ def test_unknown_front_matter_is_an_error(site_dir):
 
 def test_unknown_config_key_is_an_error(site_dir):
     config = site_dir / "config.toml"
-    config.write_text('colour = "red"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text('colour = "red"\n' + config.read_text())
     with pytest.raises(HrabalError, match="unknown keys colour"):
         load(site_dir)
 
@@ -315,21 +315,21 @@ def test_links_to_headings_are_checked(site_dir):
 
 
 def test_get_url_checks_anchors_too(site_dir):
-    (site_dir / "templates" / "page.html").write_text("{{ get_url('@/posts/simple.md#nope') }}", encoding="utf-8")
+    (site_dir / "templates" / "page.html").write_text("{{ get_url('@/posts/simple.md#nope') }}")
     with pytest.raises(HrabalError, match="points to a heading that isn't there"):
         Site(site_dir).build()
 
 
 def test_insert_anchor_links_must_be_known(site_dir):
     config = site_dir / "config.toml"
-    config.write_text('insert_anchor_links = "top"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text('insert_anchor_links = "top"\n' + config.read_text())
     with pytest.raises(HrabalError, match="insert_anchor_links must be one of none, left, right, heading"):
         load(site_dir)
 
 
 def test_anchor_links_come_from_the_config(site_dir):
     config = site_dir / "config.toml"
-    config.write_text('insert_anchor_links = "right"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text('insert_anchor_links = "right"\n' + config.read_text())
 
     content = load(site_dir).pages["posts/simple.md"].content
     assert '<h2 id="details">Details <a class="anchor" href="#details"' in content

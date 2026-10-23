@@ -32,21 +32,21 @@ def test_starter_is_styled_with_neat_css(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
     assert index.index("neat.css") < index.index("style.css")  # our rules come after Neat's
     # Neat is MIT licensed, the notice has to travel with the file
-    assert "Copyright (c) 2021-2026 by Dare Companies Dotcom LLC" in (public / "neat.css").read_text(encoding="utf-8")
+    assert "Copyright (c) 2021-2026 by Dare Companies Dotcom LLC" in (public / "neat.css").read_text()
 
 
 def test_starter_has_a_theme_switch(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
     assert 'class="theme-switch"' in index
     assert index.index("theme.js") < index.index("</head>")  # early, so the page doesn't flash
     assert (public / "theme.js").exists()
-    assert ':root[data-theme="dark"]' in (public / "style.css").read_text(encoding="utf-8")
+    assert ':root[data-theme="dark"]' in (public / "style.css").read_text()
 
 
 def test_starter_can_draw_diagrams_and_math_on_every_page(starter_dir):
@@ -56,13 +56,13 @@ def test_starter_can_draw_diagrams_and_math_on_every_page(starter_dir):
     public = starter_dir / "public"
 
     for path in ("", "blog", "about", "tags/hrabal"):
-        page = (public / path / "index.html").read_text(encoding="utf-8")
+        page = (public / path / "index.html").read_text()
         assert '<script type="module" src="https://example.com/mermaid.js">' in page
         assert '<script type="module" src="https://example.com/math.js">' in page
     assert (public / "mermaid.js").exists()
     assert (public / "math.js").exists()
 
-    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text()
     assert '<pre class="mermaid">' in tour
     assert '<span class="math inline">e^{i\\pi} + 1 = 0</span>' in tour
     assert "$5 and $10" in tour
@@ -72,12 +72,12 @@ def test_starter_has_a_feed(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
     assert (
         '<link rel="alternate" type="application/atom+xml" title="My site" href="https://example.com/atom.xml">'
         in index
     )
-    feed = (public / "atom.xml").read_text(encoding="utf-8")
+    feed = (public / "atom.xml").read_text()
     assert "<name>Your Name</name>" in feed
     assert "Příliš hlučná samota" in feed
     assert "Not ready yet" not in feed  # the draft
@@ -87,7 +87,7 @@ def test_starter_icon_shows_next_to_the_title_and_as_favicon(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
     assert '<link rel="icon" href="https://example.com/icon.svg" type="image/svg+xml">' in index
     assert '<img src="https://example.com/icon.svg" alt="">' in index
     assert (public / "icon.svg").exists()
@@ -95,10 +95,10 @@ def test_starter_icon_shows_next_to_the_title_and_as_favicon(starter_dir):
 
 def test_starter_icon_can_be_left_out(starter_dir):
     config = starter_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").replace('icon = "icon.svg"', 'icon = ""'), encoding="utf-8")
+    config.write_text(config.read_text().replace('icon = "icon.svg"', 'icon = ""'))
     Site(starter_dir).build()
 
-    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    index = (starter_dir / "public" / "index.html").read_text()
     assert 'rel="icon"' not in index
     assert "<img" not in index
 
@@ -107,10 +107,10 @@ def test_starter_has_a_search_page(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    page = (public / "search" / "index.html").read_text(encoding="utf-8")
+    page = (public / "search" / "index.html").read_text()
     assert '<div class="search search-page" data-index="https://example.com/search_index.json"' in page
 
-    index = (public / "search_index.json").read_text(encoding="utf-8")
+    index = (public / "search_index.json").read_text()
     assert "Příliš hlučná samota" in index
     assert '"title":"Search"' not in index  # the search page keeps itself out
     assert (public / "search.js").exists()
@@ -118,7 +118,7 @@ def test_starter_has_a_search_page(starter_dir):
 
 def test_starter_opens_search_from_a_magnifying_glass(starter_dir):
     Site(starter_dir).build()
-    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    index = (starter_dir / "public" / "index.html").read_text()
 
     # a real link to the search page, which search.js turns into the overlay
     assert '<a class="search-open" href="https://example.com/search/"' in index
@@ -130,9 +130,9 @@ def test_starter_opens_search_from_a_magnifying_glass(starter_dir):
 
 def test_starter_without_search_has_no_magnifying_glass(starter_dir):
     config = starter_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").replace("build_search_index = true\n", ""), encoding="utf-8")
+    config.write_text(config.read_text().replace("build_search_index = true\n", ""))
     Site(starter_dir).build()
-    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    index = (starter_dir / "public" / "index.html").read_text()
 
     assert "search-open" not in index
     assert "<dialog" not in index
@@ -141,16 +141,16 @@ def test_starter_without_search_has_no_magnifying_glass(starter_dir):
 
 def test_starter_footer_has_a_copyright_line(starter_dir):
     Site(starter_dir).build()
-    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    index = (starter_dir / "public" / "index.html").read_text()
 
     assert f"© 2024–{datetime.date.today().year} Your Name" in index  # noqa: RUF001, an en dash on purpose
 
 
 def test_copyright_line_without_a_start_year_has_just_this_one(starter_dir):
     config = starter_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").replace("copyright_since = 2024", "#"), encoding="utf-8")
+    config.write_text(config.read_text().replace("copyright_since = 2024", "#"))
     Site(starter_dir).build()
-    index = (starter_dir / "public" / "index.html").read_text(encoding="utf-8")
+    index = (starter_dir / "public" / "index.html").read_text()
 
     assert f"© {datetime.date.today().year} Your Name" in index
 
@@ -159,7 +159,7 @@ def test_starter_adds_copy_buttons_to_code(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    post = (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    post = (public / "blog" / "prilis-hlucna-samota" / "index.html").read_text()
     assert '<script defer src="https://example.com/copy.js" data-copy="Kopírovat" data-copied="Zkopírováno"' in post
     for name in ("copy.js", "copy.svg", "check.svg"):
         assert (public / name).exists()
@@ -168,7 +168,7 @@ def test_starter_adds_copy_buttons_to_code(starter_dir):
 def test_starter_tour_shows_off_what_a_post_can_hold(starter_dir):
     Site(starter_dir).build()
     folder = starter_dir / "public" / "blog" / "a-tour-of-hrabal"
-    tour = (folder / "index.html").read_text(encoding="utf-8")
+    tour = (folder / "index.html").read_text()
 
     assert "<time>20. července 2024</time>" in tour  # the date comes from the folder name
     for kind in ("note", "tip", "important", "warning", "caution"):
@@ -190,7 +190,7 @@ def test_starter_tour_shows_off_what_a_post_can_hold(starter_dir):
 def test_starter_has_an_icon_for_every_alert(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
-    css = (public / "style.css").read_text(encoding="utf-8")
+    css = (public / "style.css").read_text()
 
     for kind in ("note", "tip", "important", "warning", "caution"):
         assert (public / "alerts" / f"{kind}.svg").exists()
@@ -204,9 +204,9 @@ def test_starter_says_when_a_post_was_last_edited(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"
 
-    tour = (blog / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    tour = (blog / "a-tour-of-hrabal" / "index.html").read_text()
     assert '<p class="updated">Naposledy upraveno <time>2. srpna 2024</time></p>' in tour  # from its front matter
-    samota = (blog / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    samota = (blog / "prilis-hlucna-samota" / "index.html").read_text()
     assert "Naposledy upraveno <time>9. března 2025</time>" in samota  # from the file
 
 
@@ -216,14 +216,14 @@ def test_no_edit_date_when_nothing_changed_after_publishing(starter_dir):
     os.utime(post, (published, published))
     Site(starter_dir).build()
 
-    samota = (starter_dir / "public" / "blog" / "prilis-hlucna-samota" / "index.html").read_text(encoding="utf-8")
+    samota = (starter_dir / "public" / "blog" / "prilis-hlucna-samota" / "index.html").read_text()
     assert "Naposledy upraveno" not in samota
 
 
 def test_starter_header_folds_its_links_into_a_menu(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
     links = index.split('<div class="menu-links" id="menu-links">')[1].split("</div>")[0]
 
     assert ">Blog</a>" in links
@@ -242,8 +242,8 @@ def test_menu_only_folds_when_scripts_run(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    assert 'root.classList.add("js")' in (public / "theme.js").read_text(encoding="utf-8")
-    css = (public / "style.css").read_text(encoding="utf-8")
+    assert 'root.classList.add("js")' in (public / "theme.js").read_text()
+    css = (public / "style.css").read_text()
     assert "@media (max-width: 600px)" in css
     assert ":root.js .menu-links {\n    display: none;" in css
 
@@ -252,7 +252,7 @@ def test_starter_blog_is_paginated(starter_dir):
     Site(starter_dir).build()
     blog = starter_dir / "public" / "blog"
 
-    listing = (blog / "index.html").read_text(encoding="utf-8")
+    listing = (blog / "index.html").read_text()
     assert "Příliš hlučná samota" in listing
     assert "Starší" not in listing  # just one pager, so nowhere to go
     assert (blog / "page" / "1" / "index.html").exists()
@@ -262,8 +262,8 @@ def test_starter_uses_descriptions_in_meta_tags(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    blog = (public / "blog" / "index.html").read_text(encoding="utf-8")
-    about = (public / "about" / "index.html").read_text(encoding="utf-8")
+    blog = (public / "blog" / "index.html").read_text()
+    about = (public / "about" / "index.html").read_text()
     assert '<meta name="description" content="Notes about books, now and then">' in blog
     assert '<meta name="description" content="A site made with hrabal">' in about  # falls back to config
 
@@ -308,29 +308,27 @@ def test_starter_summary(starter_dir):
 def test_starter_speaks_czech(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
 
     assert '<html lang="cs">' in index
     assert ">Štítky</a>" in index
     assert "<h2>Nejnovější příspěvky</h2>" in index
     assert 'placeholder="Hledat…"' in index
     assert "<time>20. července 2024</time>" in index  # date_long from hrabal's own Czech
-    assert "<h1>Štítky</h1>" in (public / "tags" / "index.html").read_text(encoding="utf-8")
+    assert "<h1>Štítky</h1>" in (public / "tags" / "index.html").read_text()
 
 
 def test_starter_switches_to_english_with_one_line(starter_dir):
     config = starter_dir / "config.toml"
-    config.write_text(
-        config.read_text(encoding="utf-8").replace('language = "cs"', 'language = "en"'), encoding="utf-8"
-    )
+    config.write_text(config.read_text().replace('language = "cs"', 'language = "en"'))
     Site(starter_dir).build()
     public = starter_dir / "public"
-    index = (public / "index.html").read_text(encoding="utf-8")
+    index = (public / "index.html").read_text()
 
     assert '<html lang="en">' in index
     assert ">Štítky</a>" in index  # the menu says what [theme] says, everything hrabal writes itself switches
-    assert "<h1>Tags</h1>" in (public / "tags" / "index.html").read_text(encoding="utf-8")
+    assert "<h1>Tags</h1>" in (public / "tags" / "index.html").read_text()
     assert "<h2>Latest posts</h2>" in index
     assert "<time>July 20, 2024</time>" in index
-    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text(encoding="utf-8")
+    tour = (public / "blog" / "a-tour-of-hrabal" / "index.html").read_text()
     assert '<p class="markdown-alert-title">Note</p>' in tour

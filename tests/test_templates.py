@@ -10,7 +10,7 @@ from hrabal.site import Site
 
 
 def html(public: Path, path: str = "") -> str:
-    return (public / path / "index.html").read_text(encoding="utf-8")
+    return (public / path / "index.html").read_text()
 
 
 def test_index_sees_config_and_template_functions(public):
@@ -90,7 +90,7 @@ def test_date_filter_speaks_czech(public):
 
 def test_date_filter_follows_the_site_language(site_dir, tmp_path):
     config = site_dir / "config.toml"
-    config.write_text('language = "cs"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text('language = "cs"\n' + config.read_text())
     output = tmp_path / "czech"
     Site(site_dir, output_dir=output).build()
 
@@ -99,7 +99,7 @@ def test_date_filter_follows_the_site_language(site_dir, tmp_path):
 
 def test_date_filter_with_an_unknown_locale_stops_the_build(site_dir):
     config = site_dir / "config.toml"
-    config.write_text('language = "tlh"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
+    config.write_text('language = "tlh"\n' + config.read_text())
 
     with pytest.raises(HrabalError, match="no translation for 'months' in 'tlh'"):
         Site(site_dir).build()
@@ -162,8 +162,8 @@ def test_pages_know_when_they_have_a_diagram(public):
 
 def test_alerts_speak_the_site_language(site_dir, tmp_path):
     config = site_dir / "config.toml"
-    config.write_text('language = "cs"\n' + config.read_text(encoding="utf-8"), encoding="utf-8")
-    (site_dir / "content" / "careful.md").write_text("> [!CAUTION]\n> Hot.\n", encoding="utf-8")
+    config.write_text('language = "cs"\n' + config.read_text())
+    (site_dir / "content" / "careful.md").write_text("> [!CAUTION]\n> Hot.\n")
     output = tmp_path / "czech"
     Site(site_dir, output_dir=output).build()
 

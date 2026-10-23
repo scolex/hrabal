@@ -6,7 +6,7 @@ from hrabal.site import Site
 
 
 def read_index(public: Path) -> dict[str, dict]:
-    entries = json.loads((public / "search_index.json").read_text(encoding="utf-8"))
+    entries = json.loads((public / "search_index.json").read_text())
     return {entry["url"].removeprefix("https://example.com"): entry for entry in entries}
 
 
@@ -31,7 +31,7 @@ def test_entry_has_what_the_search_box_needs(public):
 
 
 def test_czech_stays_readable_in_the_file(public):
-    raw = (public / "search_index.json").read_text(encoding="utf-8")
+    raw = (public / "search_index.json").read_text()
     assert "Příliš žluťoučký kůň" in raw  # not ří...
 
 
@@ -48,7 +48,7 @@ def test_text_is_without_html_or_diagram_source(public):
 
 
 def test_page_can_stay_out_of_the_index(site_dir):
-    (site_dir / "content" / "secret.md").write_text('+++\ntitle = "Hidden"\nsearch = false\n+++\n', encoding="utf-8")
+    (site_dir / "content" / "secret.md").write_text('+++\ntitle = "Hidden"\nsearch = false\n+++\n')
     Site(site_dir).build()
 
     assert "/secret/" not in read_index(site_dir / "public")
@@ -63,7 +63,7 @@ def test_drafts_are_indexed_only_when_built(site_dir, tmp_path):
 
 
 def test_long_pages_are_cut(site_dir):
-    (site_dir / "content" / "long.md").write_text("+++\n+++\n" + "word " * 5000, encoding="utf-8")
+    (site_dir / "content" / "long.md").write_text("+++\n+++\n" + "word " * 5000)
     Site(site_dir).build()
 
     assert len(read_index(site_dir / "public")["/long/"]["text"]) == TEXT_LIMIT
@@ -71,7 +71,7 @@ def test_long_pages_are_cut(site_dir):
 
 def test_index_is_off_unless_asked_for(site_dir):
     config = site_dir / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8").replace("build_search_index = true\n", ""), encoding="utf-8")
+    config.write_text(config.read_text().replace("build_search_index = true\n", ""))
     Site(site_dir).build()
 
     assert not (site_dir / "public" / "search_index.json").exists()

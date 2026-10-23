@@ -23,12 +23,12 @@ def titles(pages: list[Page]) -> list[str]:
 
 
 def html(public: Path, path: str = "") -> str:
-    return (public / path / "index.html").read_text(encoding="utf-8")
+    return (public / path / "index.html").read_text()
 
 
 def write(path: Path, text: str):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text)
 
 
 # the paginator on its own

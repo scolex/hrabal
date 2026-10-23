@@ -48,7 +48,7 @@ def search_index(pages: list[Page]) -> str:
             "url": page.permalink,
             "date": page.date.isoformat()[:10] if page.date else None,
             "description": page.description,
-            "tags": [term for terms in page.taxonomies.values() for term in terms],
+            "tags": [*terms for terms in page.taxonomies.values()],
             "text": page_text(page.content)[:TEXT_LIMIT],
         }
         for page in sorted(pages, key=lambda page: page.permalink)

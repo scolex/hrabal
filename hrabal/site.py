@@ -436,7 +436,7 @@ class Site:
     def write_file(self, path: str, text: str):
         target = self.output_dir / path.lstrip("/")
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(text, encoding="utf-8")
+        target.write_text(text)
 
     # functions available in templates
 

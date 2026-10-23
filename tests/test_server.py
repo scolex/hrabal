@@ -12,7 +12,7 @@ from hrabal.server import Handler
 
 @pytest.fixture
 def server_url(tmp_path: Path):
-    (tmp_path / "style.css").write_text("body { color: black; }", encoding="utf-8")
+    (tmp_path / "style.css").write_text("body { color: black; }")
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Handler, directory=tmp_path))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     yield f"http://127.0.0.1:{server.server_port}"
@@ -34,7 +34,7 @@ def test_version_tells_pages_when_to_reload(server_url, monkeypatch):
 
 
 def test_missing_page_gets_the_sites_404_page(server_url, tmp_path):
-    (tmp_path / "404.html").write_text("<h1>Page not found</h1>", encoding="utf-8")
+    (tmp_path / "404.html").write_text("<h1>Page not found</h1>")
 
     with pytest.raises(urllib.error.HTTPError) as error:
         urllib.request.urlopen(f"{server_url}/nowhere/")

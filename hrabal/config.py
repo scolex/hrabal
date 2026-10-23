@@ -64,7 +64,7 @@ def load_config(file: Path) -> Config:
         raise HrabalError(f"{file} not found, is this a hrabal site?")
 
     try:
-        data = tomllib.loads(file.read_text(encoding="utf-8"))
+        data = tomllib.loads(file.read_text())
     except tomllib.TOMLDecodeError as e:
         raise HrabalError(f"{file}: {e}") from None
 

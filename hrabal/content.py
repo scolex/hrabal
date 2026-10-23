@@ -122,7 +122,7 @@ class Taxonomy:
 
 
 def read_markdown(file: Path, allowed_keys: set[str]) -> tuple[dict, str]:
-    text = file.read_text(encoding="utf-8")
+    text = file.read_text()
     if not text.startswith("+++"):
         return {}, text
 

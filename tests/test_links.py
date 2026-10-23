@@ -98,8 +98,8 @@ def test_skip_prefixes(server):
 
 def make_site(root: Path, links: str, config: str = ""):
     (root / "content").mkdir(parents=True)
-    (root / "config.toml").write_text(f'base_url = "https://example.com"\n{config}', encoding="utf-8")
-    (root / "content" / "_index.md").write_text(links, encoding="utf-8")
+    (root / "config.toml").write_text(f'base_url = "https://example.com"\n{config}')
+    (root / "content" / "_index.md").write_text(links)
     return root
 
 
@@ -122,10 +122,10 @@ def test_check_command_is_happy_when_all_work(server, tmp_path, capsys):
 
 def test_check_command_leaves_out_the_sites_own_links(server, tmp_path, capsys):
     (tmp_path / "site" / "content").mkdir(parents=True)
-    (tmp_path / "site" / "content" / "about.md").write_text("About\n", encoding="utf-8")
+    (tmp_path / "site" / "content" / "about.md").write_text("About\n")
     links = f"[about](@/about.md), [by hand](https://example.com/about/) and [gone]({server}/missing)\n"
-    (tmp_path / "site" / "content" / "_index.md").write_text(links, encoding="utf-8")
-    (tmp_path / "site" / "config.toml").write_text('base_url = "https://example.com"\n', encoding="utf-8")
+    (tmp_path / "site" / "content" / "_index.md").write_text(links)
+    (tmp_path / "site" / "config.toml").write_text('base_url = "https://example.com"\n')
 
     with pytest.raises(SystemExit, match="1 broken of 1 links"):
         main(["-r", str(tmp_path / "site"), "check"])

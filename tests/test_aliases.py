@@ -7,7 +7,7 @@ from hrabal.site import Site
 
 
 def read(public, path: str) -> str:
-    return (public / path).read_text(encoding="utf-8")
+    return (public / path).read_text()
 
 
 def test_alias_becomes_a_redirect_folder(public):
@@ -34,7 +34,7 @@ def test_aliases_stay_out_of_the_sitemap(public):
 
 def write_page(site_dir, aliases: str):
     text = f'+++\ntitle = "Moved"\naliases = {aliases}\n+++\n'
-    (site_dir / "content" / "moved.md").write_text(text, encoding="utf-8")
+    (site_dir / "content" / "moved.md").write_text(text)
 
 
 @pytest.mark.parametrize(

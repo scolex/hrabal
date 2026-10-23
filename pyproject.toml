@@ -5,7 +5,7 @@ description = "A small static site generator in the spirit of Zola"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.14"
+requires-python = ">=3.15"
 dependencies = [
     "jinja2>=3.1",
     "markdown-it-py>=3.0",

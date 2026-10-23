@@ -15,11 +15,9 @@ from hrabal.site import BUILT_IN_TEMPLATES, THEME, Site
 def plain_site(tmp_path: Path) -> Path:
     root = tmp_path / "site"
     (root / "content" / "blog").mkdir(parents=True)
-    (root / "config.toml").write_text('base_url = "https://example.com"\ntitle = "Plain"\n', encoding="utf-8")
-    (root / "content" / "blog" / "_index.md").write_text('+++\ntitle = "Blog"\n+++\n', encoding="utf-8")
-    (root / "content" / "blog" / "first.md").write_text(
-        '+++\ntitle = "First"\ndate = 2024-05-01\n+++\n', encoding="utf-8"
-    )
+    (root / "config.toml").write_text('base_url = "https://example.com"\ntitle = "Plain"\n')
+    (root / "content" / "blog" / "_index.md").write_text('+++\ntitle = "Blog"\n+++\n')
+    (root / "content" / "blog" / "first.md").write_text('+++\ntitle = "First"\ndate = 2024-05-01\n+++\n')
     return root
 
 
@@ -29,12 +27,12 @@ def build(root: Path) -> Path:
 
 
 def html(public: Path, path: str = "") -> str:
-    return (public / path / "index.html").read_text(encoding="utf-8")
+    return (public / path / "index.html").read_text()
 
 
 def configure(root: Path, text: str):
     config = root / "config.toml"
-    config.write_text(config.read_text(encoding="utf-8") + text, encoding="utf-8")
+    config.write_text(config.read_text() + text)
 
 
 def test_site_without_templates_uses_the_theme(plain_site):
@@ -83,7 +81,7 @@ def test_every_feed_gets_a_link_in_the_head(plain_site):
 
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
-    (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}", encoding="utf-8")
+    (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}")
     public = build(plain_site)
 
     assert html(public, "blog/first") == "my own First"
@@ -92,19 +90,17 @@ def test_site_template_replaces_the_themes(plain_site):
 
 def test_site_static_file_replaces_the_themes(plain_site):
     (plain_site / "static").mkdir()
-    (plain_site / "static" / "style.css").write_text("body { color: red; }", encoding="utf-8")
+    (plain_site / "static" / "style.css").write_text("body { color: red; }")
     public = build(plain_site)
 
-    assert (public / "style.css").read_text(encoding="utf-8") == "body { color: red; }"
-    assert (public / "neat.css").read_text(encoding="utf-8") == (THEME / "static" / "neat.css").read_text(
-        encoding="utf-8"
-    )
+    assert (public / "style.css").read_text() == "body { color: red; }"
+    assert (public / "neat.css").read_text() == (THEME / "static" / "neat.css").read_text()
 
 
 def test_taxonomy_without_a_translation_still_gets_a_title(plain_site):
     configure(plain_site, 'taxonomies = ["categories"]\n')
     first = plain_site / "content" / "blog" / "first.md"
-    first.write_text('+++\ntitle = "First"\n[taxonomies]\ncategories = ["Books"]\n+++\n', encoding="utf-8")
+    first.write_text('+++\ntitle = "First"\n[taxonomies]\ncategories = ["Books"]\n+++\n')
     public = build(plain_site)
 
     assert "<h1>Categories</h1>" in html(public, "categories")
@@ -122,7 +118,7 @@ def test_taxonomy_without_a_translation_still_gets_a_title(plain_site):
 def test_theme_settings_are_checked(plain_site, theme, error):
     config = plain_site / "config.toml"
     if theme.startswith("theme ="):
-        config.write_text(theme + config.read_text(encoding="utf-8"), encoding="utf-8")
+        config.write_text(theme + config.read_text())
     else:
         configure(plain_site, theme)
     with pytest.raises(HrabalError, match=error):
@@ -169,7 +165,7 @@ def test_nested_sections_get_breadcrumbs_in_the_site_language(plain_site):
     configure(plain_site, 'language = "cs"\n[theme]\nbreadcrumbs = true\n')
     books = plain_site / "content" / "blog" / "books"
     books.mkdir()
-    (books / "_index.md").write_text('+++\ntitle = "Knihy"\n+++\n', encoding="utf-8")
+    (books / "_index.md").write_text('+++\ntitle = "Knihy"\n+++\n')
     page = html(build(plain_site), "blog/books")
 
     assert 'aria-label="Drobečková navigace"' in page
@@ -179,7 +175,7 @@ def test_nested_sections_get_breadcrumbs_in_the_site_language(plain_site):
 
 def test_no_breadcrumbs_right_under_the_home_page(plain_site):
     configure(plain_site, "[theme]\nbreadcrumbs = true\n")
-    (plain_site / "content" / "about.md").write_text('+++\ntitle = "About"\n+++\n', encoding="utf-8")
+    (plain_site / "content" / "about.md").write_text('+++\ntitle = "About"\n+++\n')
     public = build(plain_site)
 
     for path in ("", "about", "blog"):
@@ -188,17 +184,17 @@ def test_no_breadcrumbs_right_under_the_home_page(plain_site):
 
 def test_every_build_has_a_404_page(plain_site):
     public = build(plain_site)
-    page = (public / "404.html").read_text(encoding="utf-8")
+    page = (public / "404.html").read_text()
 
     assert "<h1>Page not found</h1>" in page
     assert '<a class="button" href="https://example.com/">Back to the home page</a>' in page
     assert "press /" not in page  # no search on this site
-    assert "404" not in (public / "sitemap.xml").read_text(encoding="utf-8")
+    assert "404" not in (public / "sitemap.xml").read_text()
 
 
 def test_404_page_speaks_the_site_language_and_mentions_search(plain_site):
     configure(plain_site, 'language = "cs"\nbuild_search_index = true\n')
-    page = (build(plain_site) / "404.html").read_text(encoding="utf-8")
+    page = (build(plain_site) / "404.html").read_text()
 
     assert "<h1>Stránka nenalezena</h1>" in page
     assert "stačí stisknout /" in page
@@ -206,6 +202,6 @@ def test_404_page_speaks_the_site_language_and_mentions_search(plain_site):
 
 def test_site_can_bring_its_own_404_page(plain_site):
     (plain_site / "templates").mkdir()
-    (plain_site / "templates" / "404.html").write_text("lost", encoding="utf-8")
+    (plain_site / "templates" / "404.html").write_text("lost")
 
-    assert (build(plain_site) / "404.html").read_text(encoding="utf-8") == "lost"
+    assert (build(plain_site) / "404.html").read_text() == "lost"

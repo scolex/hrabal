@@ -13,11 +13,11 @@ build_search_index = true
 # of the same name in templates/ or static/ here, the rest comes from hrabal.
 [theme]
 menu = [
-    { title = "Články", url = "@/clanky/_index.md" },
+    { title = "Články", url = "@/articles/_index.md" },
     { title = "Štítky", url = "/tags/" },
     { title = "O webu", url = "@/about.md" },
 ]
-home_posts = "clanky/_index.md" # the section whose newest posts the home page lists
+home_posts = "articles/_index.md" # the section whose newest posts the home page lists
 icon = "icon.svg" # shown before the title and as the favicon, "" for none
 copyright_since = 2024 # the first year in the footer, the last one is always this year
 breadcrumbs = false # true shows Úvod › Články over the heading of a post

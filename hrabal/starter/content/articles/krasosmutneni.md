@@ -13,4 +13,4 @@ like *beautiful sadness*.
 Hrabal liked to make up words when the existing ones weren't enough.[^words] This one says in one
 word what the whole book is about.
 
-[^words]: The most famous of them is *pábitel*, see [Pábitelé](@/clanky/pabitele.md).
+[^words]: The most famous of them is *pábitel*, see [Pábitelé](@/articles/pabitele.md).

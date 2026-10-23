@@ -11,5 +11,5 @@ world a little brighter than it is. Hrabal made the word up and gave it to a boo
 
 <!-- more -->
 
-Most of his characters are pábitelé, and Uncle Pepin from [Postřižiny](@/clanky/postriziny.md) is the
+Most of his characters are pábitelé, and Uncle Pepin from [Postřižiny](@/articles/postriziny.md) is the
 greatest of them.

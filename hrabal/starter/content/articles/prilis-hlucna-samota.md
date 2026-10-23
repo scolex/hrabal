@@ -5,7 +5,7 @@ date = 2024-05-01
 tags = ["books", "hrabal"]
 +++
 
-The url comes from the file name, so this post lives at `/clanky/prilis-hlucna-samota/`.
+The url comes from the file name, so this post lives at `/articles/prilis-hlucna-samota/`.
 Set `slug` in the front matter to pick a different one.
 
 Everything above the `more` comment is the summary shown in post lists.

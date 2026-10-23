@@ -8,7 +8,7 @@ tags = ["hrabal", "markdown"]
 +++
 
 This post shows what a page in hrabal can hold. It's an ordinary Markdown file in a folder of its own,
-`content/clanky/2024-07-20-a-tour-of-hrabal/index.md`, so its date comes from the folder name and the
+`content/articles/2024-07-20-a-tour-of-hrabal/index.md`, so its date comes from the folder name and the
 picture further down lives right next to it.
 
 Everything above the `more` comment is the summary, the part you see in the list of posts and in the feed.
@@ -29,11 +29,11 @@ A footnote is a `[^name]` in the text and a `[^name]: …` line anywhere in the 
 a number of its own and ends up at the bottom of the page, with a link back to where it was used.
 
 Links to other pages of this site use their file path, like [the about page](@/about.md) or
-[the first post](@/clanky/prilis-hlucna-samota.md). hrabal checks every one of them during the build,
+[the first post](@/articles/prilis-hlucna-samota.md). hrabal checks every one of them during the build,
 so a typo stops the build instead of leaving a broken link on the site.
 
 Every heading gets an id, so links can point at it, like [the part about tables](#tables) or, checked
-like any other link, [the code below](@/clanky/2024-07-20-a-tour-of-hrabal/index.md#code). Hover over a
+like any other link, [the code below](@/articles/2024-07-20-a-tour-of-hrabal/index.md#code). Hover over a
 heading and a `#` shows up next to it, for copying a link straight to that spot.
 
 ### Lists
@@ -119,7 +119,7 @@ A block without a language stays plain:
 public/
 ├── index.html
 ├── sitemap.xml
-└── clanky/
+└── articles/
 ```
 
 ## Diagrams
@@ -160,7 +160,7 @@ Prices stay prices, so $5 and $10 is no formula. KaTeX loads only on pages that 
 
 ## Pictures
 
-![A bale of pressed paper, tied with two straps](@/clanky/2024-07-20-a-tour-of-hrabal/bale.svg)
+![A bale of pressed paper, tied with two straps](@/articles/2024-07-20-a-tour-of-hrabal/bale.svg)
 
 The picture is a file in this post's folder. A link to it with `@/` gets checked like a link to a page.
 

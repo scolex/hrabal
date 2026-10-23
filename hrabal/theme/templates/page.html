@@ -28,8 +28,8 @@
 
 {% if page.previous or page.next %}
 <nav class="neighbours">
-  {% if page.previous %}<a href="{{ page.previous.permalink }}">← {{ page.previous.title }}</a>{% endif %}
-  {% if page.next %}<a href="{{ page.next.permalink }}">{{ page.next.title }} →</a>{% endif %}
+  {% if page.previous %}<a class="previous" href="{{ page.previous.permalink }}">← {{ page.previous.title }}</a>{% endif %}
+  {% if page.next %}<a class="next" href="{{ page.next.permalink }}">{{ page.next.title }} →</a>{% endif %}
 </nav>
 {% endif %}
 {% endblock %}

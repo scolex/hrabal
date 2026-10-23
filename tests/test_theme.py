@@ -79,6 +79,32 @@ def test_every_feed_gets_a_link_in_the_head(plain_site):
     assert 'type="application/rss+xml" title="Plain" href="https://example.com/rss.xml">' in index
 
 
+def add_second_post(root: Path):
+    (root / "content" / "blog" / "second.md").write_text('+++\ntitle = "Second"\ndate = 2024-06-01\n+++\n')
+
+
+def test_neighbour_links_know_their_side(plain_site):
+    # a lone link to the next post has to stay on the right, so it needs saying which one it is
+    add_second_post(plain_site)
+    public = build(plain_site)
+
+    assert '<a class="next" href="https://example.com/blog/first/">First →</a>' in html(public, "blog/second")
+    assert '<a class="previous" href="https://example.com/blog/second/">← Second</a>' in html(public, "blog/first")
+
+
+@pytest.mark.parametrize(("paginate_by", "pagers"), [(1, 2), (10, 1)])
+def test_pagination_shows_only_with_more_than_one_pager(plain_site, paginate_by, pagers):
+    add_second_post(plain_site)
+    section = f'+++\ntitle = "Blog"\npaginate_by = {paginate_by}\n+++\n'
+    (plain_site / "content" / "blog" / "_index.md").write_text(section)
+    blog = html(build(plain_site), "blog")
+
+    assert ('<nav class="pagination">' in blog) == (pagers > 1)
+    if pagers > 1:
+        assert "<span>1 / 2</span>" in blog
+        assert '<a class="button next" href="https://example.com/blog/page/2/">Older →</a>' in blog
+
+
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
     (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}")

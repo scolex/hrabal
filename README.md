@@ -51,8 +51,8 @@ lives at `/hello/` and is dated May 1st, unless the front matter says otherwise.
 
 hrabal's look lives in `hrabal/theme/`: its templates, [Neat CSS](https://github.com/codazoda/neatcss)
 with a warm palette on top, light and dark with a switch, search behind a magnifying glass, a sandwich
-menu on small screens, breadcrumbs if you want them, copy buttons on code, alerts, diagrams, math, footnotes
-and a friendly 404 page. A site sets it up in a `[theme]` table:
+menu on small screens, post lists grouped by year, breadcrumbs if you want them, copy buttons on code,
+alerts, diagrams, math, footnotes and a friendly 404 page. A site sets it up in a `[theme]` table:
 
 ```toml
 [theme]

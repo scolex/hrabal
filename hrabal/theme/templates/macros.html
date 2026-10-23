@@ -1,4 +1,12 @@
-{% macro post_list(pages) %}
+{# by_year puts a heading over the posts of each year. groupby sorts the years oldest first, so they get
+   turned around, and the posts within a year keep their order. Posts without a date come last. #}
+{% macro post_list(pages, by_year=false) %}
+{% if by_year %}
+{% for year, posts in pages | groupby("date.year", default=0) | reverse %}
+{% if year %}<h2 class="year">{{ year }}</h2>{% endif %}
+{{ post_list(posts) }}
+{% endfor %}
+{% else %}
 <ul class="posts">
   {% for page in pages %}
   <li>
@@ -8,6 +16,7 @@
   </li>
   {% endfor %}
 </ul>
+{% endif %}
 {% endmacro %}
 
 {# with breadcrumbs = true in [theme]: the sections above a page, from the home page down. Not the page

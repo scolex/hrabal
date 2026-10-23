@@ -135,6 +135,15 @@ footer,
   list-style: none;
 }
 
+/* the year over the posts that came out in it, halfway between the headings and the links, a warm brown */
+.year {
+  margin: 2em 0 0.8em;
+  padding-bottom: 0.2em;
+  border-bottom: 2px solid color-mix(in srgb, var(--link) 30%, transparent);
+  color: color-mix(in srgb, var(--dark) 50%, var(--link));
+  font-size: 1.1em;
+}
+
 .posts li {
   margin-bottom: 1.5em;
 }

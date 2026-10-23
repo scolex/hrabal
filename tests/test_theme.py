@@ -105,6 +105,37 @@ def test_pagination_shows_only_with_more_than_one_pager(plain_site, paginate_by,
         assert '<a class="button next" href="https://example.com/blog/page/2/">Older →</a>' in blog
 
 
+def write_posts(root: Path, posts: dict[str, str]):
+    for name, front_matter in posts.items():
+        (root / "content" / "blog" / f"{name}.md").write_text(f"+++\n{front_matter}\n+++\n")
+
+
+def test_posts_are_grouped_by_year(plain_site):
+    write_posts(
+        plain_site,
+        {
+            "old": 'title = "Old"\ndate = 2023-03-01\ntaxonomies = { tags = ["x"] }',
+            "older": 'title = "Older"\ndate = 2023-01-01',
+            "newer": 'title = "Newer"\ndate = 2024-09-01\ntaxonomies = { tags = ["x"] }',
+            "undated": 'title = "Undated"',
+        },
+    )
+    configure(plain_site, 'taxonomies = ["tags"]\n')
+    public = build(plain_site)
+    blog = html(public, "blog")
+
+    # newest year first, the posts in it newest first, and the undated ones at the end without a year
+    order = ["2024", "Newer", "First", "2023", "Old", "Older", "Undated"]
+    assert [blog.index(f">{text}<") for text in order] == sorted(blog.index(f">{text}<") for text in order)
+    assert blog.count('<h2 class="year">') == 2
+    assert '<h2 class="year">2024</h2>' in html(public, "tags/x")
+
+
+def test_posts_sorted_by_title_have_no_years(plain_site):
+    (plain_site / "content" / "blog" / "_index.md").write_text('+++\ntitle = "Blog"\nsort_by = "title"\n+++\n')
+    assert 'class="year"' not in html(build(plain_site), "blog")
+
+
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
     (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}")

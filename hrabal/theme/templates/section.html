@@ -10,7 +10,7 @@
 {{ section.content | safe }}
 
 {% if paginator %}
-{{ post_list(paginator.pages) }}
+{{ post_list(paginator.pages, by_year=section.sort_by == "date") }}
 {% if paginator.number_pagers > 1 %}
 <nav class="pagination">
   {% if paginator.previous %}<a class="button previous" href="{{ paginator.previous }}">← {{ trans("newer") }}</a>{% endif %}
@@ -19,7 +19,7 @@
 </nav>
 {% endif %}
 {% else %}
-{{ post_list(section.pages) }}
+{{ post_list(section.pages, by_year=section.sort_by == "date") }}
 {% endif %}
 
 {% if section.subsections %}

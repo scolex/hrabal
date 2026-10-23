@@ -198,7 +198,7 @@ def test_init_creates_only_config_and_content(tmp_path):
 
 def test_starter_builds_from_a_copy(tmp_path):
     site = shutil.copytree(STARTER, tmp_path / "site")
-    assert (build(site) / "blog" / "a-tour-of-hrabal" / "index.html").exists()
+    assert (build(site) / "clanky" / "a-tour-of-hrabal" / "index.html").exists()
 
 
 # the 404 page

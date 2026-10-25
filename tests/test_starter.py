@@ -146,9 +146,11 @@ def test_starter_footer_has_a_copyright_line(starter_dir):
     assert f"© 2024–{datetime.date.today().year} Your Name" in index  # noqa: RUF001, an en dash on purpose
 
 
-def test_copyright_line_without_a_start_year_has_just_this_one(starter_dir):
+@pytest.mark.parametrize("since", ["#", f"copyright_since = {datetime.date.today().year}"])
+def test_copyright_line_starting_this_year_has_just_this_one(starter_dir, since):
+    # no start year, or this one, gives "© 2026" and no range of one year
     config = starter_dir / "config.toml"
-    config.write_text(config.read_text().replace("copyright_since = 2024", "#"))
+    config.write_text(config.read_text().replace("copyright_since = 2024", since))
     Site(starter_dir).build()
     index = (starter_dir / "public" / "index.html").read_text()
 

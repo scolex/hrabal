@@ -28,6 +28,7 @@ class ThemeConfig:
     icon: str = "icon.svg"  # a file in static/, shown before the title and as the favicon, "" for none
     copyright_since: int = 0  # the first year in the footer, 0 shows just this year
     breadcrumbs: bool = False  # the sections above a page, over its heading
+    card: str = ""  # a picture in static/ that shared links show, best a 1200 by 630 PNG or JPEG
 
 
 @dataclass

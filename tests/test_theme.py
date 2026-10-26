@@ -173,6 +173,41 @@ def test_search_page_only_when_a_site_asks_for_one(plain_site):
     assert '<div class="search search-page" data-index="https://example.com/search_index.json"' in search
 
 
+def test_shared_links_get_open_graph_tags(plain_site):
+    (plain_site / "content" / "blog" / "first.md").write_text(
+        '+++\ntitle = "First"\ndate = 2024-05-01\nupdated = 2024-06-01\ndescription = "About <beer>"\n'
+        'taxonomies = { tags = ["pivo"] }\n+++\nText\n'
+    )
+    configure(plain_site, 'taxonomies = ["tags"]\n')
+    public = build(plain_site)
+    post = html(public, "blog/first")
+
+    for tag in [
+        '<meta property="og:site_name" content="Plain">',
+        '<meta property="og:title" content="First · Plain">',
+        '<meta property="og:description" content="About &lt;beer&gt;">',
+        '<meta property="og:locale" content="en_US">',
+        '<meta property="og:url" content="https://example.com/blog/first/">',
+        '<meta property="og:type" content="article">',
+        '<meta property="article:published_time" content="2024-05-01T00:00:00+00:00">',
+        '<meta property="article:modified_time" content="2024-06-01T00:00:00+00:00">',
+        '<meta property="article:tag" content="pivo">',
+        '<meta name="twitter:card" content="summary">',
+    ]:
+        assert tag in post
+    assert "og:image" not in post  # no card, no picture
+    assert '<meta property="og:type" content="website">' in html(public, "blog")
+
+
+def test_card_is_the_picture_of_shared_links(plain_site):
+    configure(plain_site, 'language = "cs"\n[theme]\ncard = "card.png"\n')
+    index = html(build(plain_site))
+
+    assert '<meta property="og:image" content="https://example.com/card.png">' in index
+    assert '<meta name="twitter:card" content="summary_large_image">' in index
+    assert '<meta property="og:locale" content="cs_CZ">' in index
+
+
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
     (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}")

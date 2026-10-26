@@ -65,7 +65,13 @@ home_posts = "blog/_index.md"         # the section whose newest posts the home 
 icon = "icon.svg"                     # before the title and as the favicon, "" for none, the default is a bale
 copyright_since = 2024                # the first year in the footer, the last one is always this year
 breadcrumbs = true                    # Home › Blog over the headings of pages deeper down, off by default
+card = "card.png"                     # the picture shared links show, best 1200×630, none by default
 ```
+
+For search engines and shared links, every page's head has a canonical link, a description (its own,
+or the start of its text) and Open Graph tags: title, description, address, language and, for posts,
+when they came out, changed and their tags. Facebook, Messenger, Slack, X and the like show those
+when someone shares a link, with `card` as the picture.
 
 Its words follow the site's language, see [Languages](#languages). To change any part of it, put a file
 of the same name in the site's `templates/` or `static/`: a `templates/page.html` replaces how pages look,

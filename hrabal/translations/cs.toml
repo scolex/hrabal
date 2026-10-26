@@ -42,3 +42,4 @@ not_found_search = "Pomoct může hledání, stačí stisknout /."
 back_home = "Zpět na úvod"
 home = "Úvod"
 breadcrumbs = "Drobečková navigace"
+locale = "cs_CZ" # language and country, for og:locale in what shared links show

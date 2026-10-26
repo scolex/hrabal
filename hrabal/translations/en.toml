@@ -42,3 +42,4 @@ not_found_search = "Searching might help, just press /."
 back_home = "Back to the home page"
 home = "Home"
 breadcrumbs = "Breadcrumbs"
+locale = "en_US" # language and country, for og:locale in what shared links show

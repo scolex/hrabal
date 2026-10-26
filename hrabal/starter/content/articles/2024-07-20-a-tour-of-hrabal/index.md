@@ -178,7 +178,7 @@ Hidden until clicked. Markdown still works in here, **see**?
 
 ---
 
-That's the tour. The [search](@/search.md) finds this post too, try `bale` or `diagram`.
+That's the tour. The search behind the magnifying glass finds this post too, try `bale` or `diagram`.
 
 [^zola]: Zola is a static site generator written in Rust, hrabal is a much smaller one written in Python.
 [^name]: The name between `[^` and `]` is only for you, readers see numbers in the order the notes appear.

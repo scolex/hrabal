@@ -2,7 +2,7 @@
 {% from "macros.html" import breadcrumbs %}
 
 {% block title %}{{ page.title }} · {{ config.title }}{% endblock %}
-{% block description %}{{ page.description or config.description }}{% endblock %}
+{% block description %}{{ page.description or page.content | excerpt or config.description }}{% endblock %}
 
 {% block content %}
 <article>

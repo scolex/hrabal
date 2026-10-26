@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+  {# the one address of this page, whichever one it was reached by: with or without www, a preview, workers.dev #}
+  {% if current_url %}
+  <link rel="canonical" href="{{ current_url }}">
+  {% endif %}
   {% if config.theme.icon %}
   <link rel="icon" href="{{ get_url(config.theme.icon) }}"{% if config.theme.icon.endswith(".svg") %} type="image/svg+xml"{% endif %}>
   {% endif %}
@@ -41,8 +45,8 @@
         {% endfor %}
       </div>
       {% if config.build_search_index %}
-      {# a plain link to the search page, search.js turns it into the overlay below #}
-      <a class="search-open" href="{{ get_url('/search/') }}" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></a>
+      {# opens the overlay below, search.js does that, so without scripts style.css hides it #}
+      <button class="search-open" type="button" title="{{ trans('search') }} (/)" aria-label="{{ trans('search') }}"></button>
       {% endif %}
       <button class="theme-switch" type="button" title="{{ trans('theme_switch') }}">◐</button>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-links"

@@ -28,7 +28,7 @@ from hrabal.dates import as_moment, format_date, rfc822, rfc3339
 from hrabal.i18n import Translations, base_language
 from hrabal.markdown import Markdown, has_math, has_mermaid, without_footnote_refs
 from hrabal.pagination import pager_url, paginate
-from hrabal.search import search_index
+from hrabal.search import excerpt, search_index
 
 # hrabal's own look: templates and static files a site uses unless it has its own of the same name
 THEME = Path(__file__).parent / "theme"
@@ -381,6 +381,7 @@ class Site:
         env.filters["date"] = self.date_filter
         env.filters["rfc3339"] = rfc3339
         env.filters["rfc822"] = rfc822
+        env.filters["excerpt"] = excerpt
         # jinja annotates globals after its own built-in ones, so widen the type before adding ours
         template_globals: dict[str, Any] = env.globals
         template_globals.update(
@@ -413,6 +414,8 @@ class Site:
         return translations[key]
 
     def render(self, templates, path: str, **context):
+        # current_path and current_url, like in Zola, say where the page being rendered will live
+        context |= {"current_path": path, "current_url": self.permalink(path)}
         self.write_html(path, self.finish_html(self.render_template(templates, path, **context)))
         self.rendered.append(path)
 

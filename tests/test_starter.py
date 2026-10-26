@@ -103,25 +103,22 @@ def test_starter_icon_can_be_left_out(starter_dir):
     assert "<img" not in index
 
 
-def test_starter_has_a_search_page(starter_dir):
+def test_starter_has_a_search_index(starter_dir):
     Site(starter_dir).build()
     public = starter_dir / "public"
 
-    page = (public / "search" / "index.html").read_text()
-    assert '<div class="search search-page" data-index="https://example.com/search_index.json"' in page
-
     index = (public / "search_index.json").read_text()
     assert "Příliš hlučná samota" in index
-    assert '"title":"Search"' not in index  # the search page keeps itself out
     assert (public / "search.js").exists()
+    assert not (public / "search").exists()  # the overlay is enough, no page of its own
 
 
 def test_starter_opens_search_from_a_magnifying_glass(starter_dir):
     Site(starter_dir).build()
     index = (starter_dir / "public" / "index.html").read_text()
 
-    # a real link to the search page, which search.js turns into the overlay
-    assert '<a class="search-open" href="https://example.com/search/"' in index
+    # a button that opens the overlay, search.js wires it up
+    assert '<button class="search-open" type="button"' in index
     assert index.index("search-open") < index.index("theme-switch")  # right before the theme switch
     assert '<dialog class="search-dialog">' in index
     assert (starter_dir / "public" / "search.svg").exists()  # the icon itself, style.css uses it as a mask
@@ -274,7 +271,8 @@ def test_starter_uses_descriptions_in_meta_tags(starter_dir):
     articles = (public / "articles" / "index.html").read_text()
     about = (public / "about" / "index.html").read_text()
     assert '<meta name="description" content="Notes about books, now and then">' in articles
-    assert '<meta name="description" content="A site made with hrabal">' in about  # falls back to config
+    # no description of its own, so the start of its text, which search engines show better than the site's
+    assert '<meta name="description" content="Pages next to _index.md belong to the root section, so this one' in about
 
 
 def test_starter_draft_is_skipped(starter_dir):

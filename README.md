@@ -297,9 +297,10 @@ It fetches the index on the first keystroke, ignores case and diacritics (`zluto
 "Žluťoučký kůň"), wants every word to match the start of a word, and ranks title above tags above text.
 
 In the theme, the magnifying glass in the header opens search in an overlay, and so do `/` and
-Ctrl/⌘+K. Esc or a click outside closes it. Without JavaScript the same icon just goes to the search
-page (`content/search.md` with the `search.html` template), which also keeps the query in the url:
-`/search/?q=hrabal` opens with results.
+Ctrl/⌘+K. Esc or a click outside closes it. Searching needs JavaScript, so without it the icon isn't
+shown. A site that wants a search page of its own too can have one: `content/search.md` with
+`template = "search.html"` and `search = false` gives `/search/`, which keeps the query in the url,
+so `/search/?q=hrabal` opens with results.
 
 ## Pagination
 
@@ -345,6 +346,10 @@ in the site's `templates/` first, then in the theme's `hrabal/theme/templates/`,
 
 `tags/list.html` and `tags/single.html` take precedence if a taxonomy needs its own look.
 
+All of them except `404.html` also get `current_path` and `current_url`, where the page being rendered
+will live, like `/blog/page/2/` and `https://example.com/blog/page/2/`. The theme uses `current_url`
+for `<link rel="canonical">`, so search engines count a page once, however it was reached.
+
 Everywhere you also get `config` and these functions:
 
 - `get_url("style.css")` or `get_url("@/about.md")`
@@ -355,6 +360,9 @@ Everywhere you also get `config` and these functions:
 - `trans("newer")`, a string in the site's language, see [Languages](#languages)
 
 and a `date` filter, with the usual `strftime` codes: `{{ page.date | date("%d. %m. %Y") }}`.
+`excerpt` gives the start of an HTML text as plain text, cut between words, 155 characters unless you
+ask for another length. The theme uses `{{ page.content | excerpt }}` as the meta description of a
+page without a `description`, so pages don't all share the site's one.
 
 Month and day names follow `language` in `config.toml`, and so do two ready-made formats,
 `{{ page.date | date(trans("date_long")) }}` and `date_short`. A template can ask for another

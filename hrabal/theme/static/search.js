@@ -99,11 +99,7 @@ function setUpOverlay(dialog, opener) {
     input.select();
   };
 
-  // the icon stays a plain link to the search page, until here it opens the overlay instead
-  opener.addEventListener("click", (event) => {
-    event.preventDefault();
-    open();
-  });
+  opener.addEventListener("click", open);
 
   // "/" like on GitHub, or ctrl/cmd + k, except while typing somewhere
   document.addEventListener("keydown", (event) => {

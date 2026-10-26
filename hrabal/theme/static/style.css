@@ -94,15 +94,23 @@ header nav a + a {
   margin-left: 1em;
 }
 
-/* search.svg gives the shape and the link color fills it, so the icon follows the theme */
-.search-open {
+/* search.svg gives the shape and the link color fills it, so the icon follows the theme,
+   and neat.css's dark button look goes */
+.search-open,
+.search-open:hover {
   display: inline-block;
   margin-left: 1em;
   width: 1.1em;
   height: 1.1em;
+  padding: 0;
   background-color: var(--link);
   -webkit-mask: url("search.svg") center / contain no-repeat;
   mask: url("search.svg") center / contain no-repeat;
+}
+
+/* searching takes search.js, theme.js marks the page when scripts run */
+:root:not(.js) .search-open {
+  display: none;
 }
 
 /* neat.css turns every button into a dark block, this one should look like the links next to it */

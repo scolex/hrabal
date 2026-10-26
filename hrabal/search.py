@@ -41,6 +41,15 @@ def page_text(html: str) -> str:
     return " ".join("".join(parser.parts).split())
 
 
+def excerpt(html: str, length: int = 155) -> str:
+    # the start of a page's text, cut between words, for a description when the page has none of its own;
+    # search engines show about this much of one
+    text = page_text(html)
+    if len(text) <= length:
+        return text
+    return text[:length].rsplit(" ", 1)[0].rstrip(",;:-–") + "…"  # noqa: RUF001, an en dash on purpose
+
+
 def search_index(pages: list[Page]) -> str:
     entries = [
         {

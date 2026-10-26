@@ -2,7 +2,7 @@
 {% from "macros.html" import breadcrumbs, post_list %}
 
 {% block title %}{{ section.title }} · {{ config.title }}{% endblock %}
-{% block description %}{{ section.description or config.description }}{% endblock %}
+{% block description %}{{ section.description or section.content | excerpt or config.description }}{% endblock %}
 
 {% block content %}
 {{ breadcrumbs(section.ancestors) }}

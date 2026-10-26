@@ -136,6 +136,43 @@ def test_posts_sorted_by_title_have_no_years(plain_site):
     assert 'class="year"' not in html(build(plain_site), "blog")
 
 
+def test_every_page_has_its_canonical_address(plain_site):
+    # one address for search engines, wherever the page was reached from
+    add_second_post(plain_site)
+    (plain_site / "content" / "blog" / "_index.md").write_text('+++\ntitle = "Blog"\npaginate_by = 1\n+++\n')
+    configure(plain_site, 'taxonomies = ["tags"]\n')
+    public = build(plain_site)
+
+    for path in ("", "blog", "blog/page/2", "blog/first", "tags"):
+        url = f"https://example.com/{path}/" if path else "https://example.com/"
+        assert f'<link rel="canonical" href="{url}">' in html(public, path)
+    assert 'rel="canonical"' not in (public / "404.html").read_text()  # stands in for any address
+
+
+def test_description_falls_back_to_the_start_of_the_text(plain_site):
+    words = " ".join(["Pivo"] * 60)  # 299 characters, far more than a description holds
+    (plain_site / "content" / "blog" / "long.md").write_text(f'+++\ntitle = "Long"\n+++\n\n<em>{words}</em>\n')
+    (plain_site / "content" / "blog" / "own.md").write_text('+++\ntitle = "Own"\ndescription = "Mine"\n+++\nText\n')
+    public = build(plain_site)
+
+    long = html(public, "blog/long")
+    description = long.split('<meta name="description" content="')[1].split('"')[0]
+    assert description.startswith("Pivo Pivo") and description.endswith("Pivo…")
+    assert len(description) <= 156
+    assert '<meta name="description" content="Mine">' in html(public, "blog/own")
+    assert '<meta name="description" content="">' in html(public, "blog/first")  # no text, and no site description
+
+
+def test_search_page_only_when_a_site_asks_for_one(plain_site):
+    configure(plain_site, "build_search_index = true\n")
+    assert not (build(plain_site) / "search").exists()
+
+    page = '+++\ntitle = "Search"\ntemplate = "search.html"\nsearch = false\n+++\n'
+    (plain_site / "content" / "search.md").write_text(page)
+    search = html(build(plain_site), "search")
+    assert '<div class="search search-page" data-index="https://example.com/search_index.json"' in search
+
+
 def test_site_template_replaces_the_themes(plain_site):
     (plain_site / "templates").mkdir()
     (plain_site / "templates" / "page.html").write_text("my own {{ page.title }}")
